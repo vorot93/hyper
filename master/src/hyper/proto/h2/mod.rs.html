@@ -181,6 +181,8 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Buf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>};
@@ -287,20 +289,21 @@
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data_done</span> {
-                <span class="comment">// TODO: make use of flow control on SendStream</span>
-                <span class="comment">// If you&#39;re looking at this and thinking of trying to fix this TODO,</span>
-                <span class="comment">// you may want to look at:</span>
-                <span class="comment">// https://docs.rs/h2/0.1.*/h2/struct.SendStream.html</span>
-                <span class="comment">//</span>
-                <span class="comment">// With that doc open, we&#39;d want to do these things:</span>
-                <span class="comment">// - check self.body_tx.capacity() to see if we can send *any* data</span>
-                <span class="comment">// - if &gt; 0:</span>
-                <span class="comment">// -   poll self.stream</span>
-                <span class="comment">// -   reserve chunk.len() more capacity (because its about to be used)?</span>
-                <span class="comment">// -   send the chunk</span>
-                <span class="comment">// - else:</span>
-                <span class="comment">// -   try reserve a smallish amount of capacity</span>
-                <span class="comment">// -   call self.body_tx.poll_capacity(), return if NotReady</span>
+                <span class="comment">// we don&#39;t have the next chunk of data yet, so just reserve 1 byte to make</span>
+                <span class="comment">// sure there&#39;s some capacity available. h2 will handle the capacity management</span>
+                <span class="comment">// for the actual body chunk.</span>
+                <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">reserve_capacity</span>(<span class="number">1</span>);
+
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">capacity</span>() <span class="op">==</span> <span class="number">0</span> {
+                    <span class="kw">loop</span> {
+                        <span class="kw">match</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">poll_capacity</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_h2</span>)) {
+                            <span class="prelude-val">Some</span>(<span class="number">0</span>) <span class="op">=&gt;</span> {}
+                            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="kw">break</span>,
+                            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_canceled</span>(<span class="prelude-val">None</span>::<span class="op">&lt;</span>::<span class="ident">Error</span><span class="op">&gt;</span>)),
+                        }
+                    }
+                }
+
                 <span class="kw">match</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll_data</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">on_err</span>(<span class="ident">e</span>))) {
                     <span class="prelude-val">Some</span>(<span class="ident">chunk</span>) <span class="op">=&gt;</span> {
                         <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
@@ -320,6 +323,7 @@
                         }
                     }
                     <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                        <span class="self">self</span>.<span class="ident">body_tx</span>.<span class="ident">reserve_capacity</span>(<span class="number">0</span>);
                         <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
                         <span class="kw">if</span> <span class="ident">is_eos</span> {
                             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">send_eos_frame</span>().<span class="ident">map</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>);
