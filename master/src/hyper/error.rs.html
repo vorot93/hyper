@@ -345,6 +345,19 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Error and Result module.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -409,6 +422,12 @@
     <span class="ident">UnsupportedVersion</span>,
     <span class="doccomment">/// User tried to create a CONNECT Request with the Client.</span>
     <span class="ident">UnsupportedRequestMethod</span>,
+
+    <span class="doccomment">/// User tried polling for an upgrade that doesn&#39;t exist.</span>
+    <span class="ident">NoUpgrade</span>,
+
+    <span class="doccomment">/// User polled for an upgrade, but low-level API is not using upgrades.</span>
+    <span class="ident">ManualUpgrade</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
@@ -420,9 +439,6 @@
     <span class="ident">Header</span>,
     <span class="ident">TooLarge</span>,
     <span class="ident">Status</span>,
-
-    <span class="doccomment">/// A protocol upgrade was encountered, but not yet supported in hyper.</span>
-    <span class="ident">UpgradeNotSupported</span>,
 }
 
 <span class="comment">/*
@@ -458,7 +474,8 @@ pub(crate) enum User {
             <span class="ident">Kind</span>::<span class="ident">Service</span> <span class="op">|</span>
             <span class="ident">Kind</span>::<span class="ident">Closed</span> <span class="op">|</span>
             <span class="ident">Kind</span>::<span class="ident">UnsupportedVersion</span> <span class="op">|</span>
-            <span class="ident">Kind</span>::<span class="ident">UnsupportedRequestMethod</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Kind</span>::<span class="ident">UnsupportedRequestMethod</span> <span class="op">|</span>
+            <span class="ident">Kind</span>::<span class="ident">NoUpgrade</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
@@ -564,6 +581,14 @@ pub(crate) enum User {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">UnsupportedRequestMethod</span>, <span class="prelude-val">None</span>)
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_user_no_upgrade</span>() <span class="op">-&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">NoUpgrade</span>, <span class="prelude-val">None</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_user_manual_upgrade</span>() <span class="op">-&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">ManualUpgrade</span>, <span class="prelude-val">None</span>)
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_user_new_service</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cause</span><span class="op">&gt;&gt;</span>(<span class="ident">cause</span>: <span class="ident">E</span>) <span class="op">-&gt;</span> <span class="ident">Error</span> {
         <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">Kind</span>::<span class="ident">NewService</span>, <span class="prelude-val">Some</span>(<span class="ident">cause</span>.<span class="ident">into</span>()))
     }
@@ -614,7 +639,6 @@ pub(crate) enum User {
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Header</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid Header provided&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">TooLarge</span>) <span class="op">=&gt;</span> <span class="string">&quot;message head is too large&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">Status</span>) <span class="op">=&gt;</span> <span class="string">&quot;invalid Status provided&quot;</span>,
-            <span class="ident">Kind</span>::<span class="ident">Parse</span>(<span class="ident">Parse</span>::<span class="ident">UpgradeNotSupported</span>) <span class="op">=&gt;</span> <span class="string">&quot;unsupported protocol upgrade&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Incomplete</span> <span class="op">=&gt;</span> <span class="string">&quot;message is incomplete&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">MismatchedResponse</span> <span class="op">=&gt;</span> <span class="string">&quot;response received without matching request&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="string">&quot;connection closed&quot;</span>,
@@ -632,6 +656,8 @@ pub(crate) enum User {
             <span class="ident">Kind</span>::<span class="ident">Http2</span> <span class="op">=&gt;</span> <span class="string">&quot;http2 general error&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">UnsupportedVersion</span> <span class="op">=&gt;</span> <span class="string">&quot;request has unsupported HTTP version&quot;</span>,
             <span class="ident">Kind</span>::<span class="ident">UnsupportedRequestMethod</span> <span class="op">=&gt;</span> <span class="string">&quot;request has unsupported HTTP method&quot;</span>,
+            <span class="ident">Kind</span>::<span class="ident">NoUpgrade</span> <span class="op">=&gt;</span> <span class="string">&quot;no upgrade available&quot;</span>,
+            <span class="ident">Kind</span>::<span class="ident">ManualUpgrade</span> <span class="op">=&gt;</span> <span class="string">&quot;upgrade expected but low level API in use&quot;</span>,
 
             <span class="ident">Kind</span>::<span class="ident">Io</span> <span class="op">=&gt;</span> <span class="string">&quot;an IO error occurred&quot;</span>,
         }

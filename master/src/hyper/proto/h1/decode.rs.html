@@ -534,18 +534,6 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -556,7 +544,7 @@
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Bytes</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">io</span>::<span class="ident">MemRead</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">BodyLength</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">DecodedLength</span>};
 
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Kind</span>::{<span class="ident">Length</span>, <span class="ident">Chunked</span>, <span class="ident">Eof</span>};
 
@@ -623,6 +611,14 @@
         <span class="ident">Decoder</span> { <span class="ident">kind</span>: <span class="ident">Kind</span>::<span class="ident">Eof</span>(<span class="bool-val">false</span>) }
     }
 
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">len</span>: <span class="ident">DecodedLength</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">len</span> {
+            <span class="ident">DecodedLength</span>::<span class="ident">CHUNKED</span> <span class="op">=&gt;</span> <span class="ident">Decoder</span>::<span class="ident">chunked</span>(),
+            <span class="ident">DecodedLength</span>::<span class="ident">CLOSE_DELIMITED</span> <span class="op">=&gt;</span> <span class="ident">Decoder</span>::<span class="ident">eof</span>(),
+            <span class="ident">length</span> <span class="op">=&gt;</span> <span class="ident">Decoder</span>::<span class="ident">length</span>(<span class="ident">length</span>.<span class="ident">danger_len</span>()),
+        }
+    }
+
     <span class="comment">// methods</span>
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
@@ -631,16 +627,6 @@
             <span class="ident">Chunked</span>(<span class="ident">ChunkedState</span>::<span class="ident">End</span>, <span class="kw">_</span>) <span class="op">|</span>
             <span class="ident">Eof</span>(<span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Length</span>(<span class="number">0</span>) <span class="op">|</span>
-            <span class="ident">Chunked</span>(<span class="ident">ChunkedState</span>::<span class="ident">End</span>, <span class="kw">_</span>) <span class="op">|</span>
-            <span class="ident">Eof</span>(<span class="bool-val">true</span>) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">Length</span>(<span class="ident">len</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">BodyLength</span>::<span class="ident">Known</span>(<span class="ident">len</span>)),
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">BodyLength</span>::<span class="ident">Unknown</span>),
         }
     }
 
@@ -698,16 +684,6 @@
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Decoder</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">fmt</span>::<span class="ident">Debug</span>::<span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">f</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Decoder</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind</span>::<span class="ident">Length</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;content-length ({} bytes)&quot;</span>, <span class="ident">n</span>),
-            <span class="ident">Kind</span>::<span class="ident">Chunked</span>(..) <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;chunked encoded&quot;</span>),
-            <span class="ident">Kind</span>::<span class="ident">Eof</span>(..) <span class="op">=&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;until end-of-file&quot;</span>),
-        }
     }
 }
 

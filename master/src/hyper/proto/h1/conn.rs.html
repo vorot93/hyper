@@ -1159,6 +1159,41 @@
 <span id="1159">1159</span>
 <span id="1160">1160</span>
 <span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
@@ -1170,9 +1205,9 @@
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
 <span class="kw">use</span> ::<span class="ident">Chunk</span>;
-<span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">MessageHead</span>};
+<span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">DecodedLength</span>, <span class="ident">MessageHead</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">io</span>::{<span class="ident">Buffered</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EncodedBuf</span>, <span class="ident">Encode</span>, <span class="ident">Encoder</span>, <span class="ident">Decode</span>, <span class="ident">Decoder</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EncodedBuf</span>, <span class="ident">Encode</span>, <span class="ident">Encoder</span>, <span class="comment">/*Decode,*/</span> <span class="ident">Decoder</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>};
 
 <span class="kw">const</span> <span class="ident">H2_PREFACE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n&quot;</span>;
 
@@ -1206,6 +1241,7 @@
                 <span class="ident">notify_read</span>: <span class="bool-val">false</span>,
                 <span class="ident">reading</span>: <span class="ident">Reading</span>::<span class="ident">Init</span>,
                 <span class="ident">writing</span>: <span class="ident">Writing</span>::<span class="ident">Init</span>,
+                <span class="ident">upgrade</span>: <span class="prelude-val">None</span>,
                 <span class="comment">// We assume a modern world where the remote speaks HTTP/1.1.</span>
                 <span class="comment">// If they tell us otherwise, we&#39;ll downgrade in `read_head`.</span>
                 <span class="ident">version</span>: <span class="ident">Version</span>::<span class="ident">HTTP_11</span>,
@@ -1232,6 +1268,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">I</span>, <span class="ident">Bytes</span>) {
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">into_inner</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>::<span class="ident">upgrade</span>::<span class="ident">Pending</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">upgrade</span>.<span class="ident">take</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
@@ -1276,80 +1316,61 @@
         <span class="ident">read_buf</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="number">24</span> <span class="op">&amp;&amp;</span> <span class="ident">read_buf</span>[..<span class="number">24</span>] <span class="op">==</span> <span class="kw-2">*</span><span class="ident">H2_PREFACE</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, <span class="ident">DecodedLength</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_read_head</span>());
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Conn::read_head&quot;</span>);
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">ParseContext</span> {
-                <span class="ident">cached_headers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>,
-                <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">method</span>,
-            }) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">msg</span>)) <span class="op">=&gt;</span> <span class="ident">msg</span>,
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
-                    <span class="comment">// If we are currently waiting on a message, then an empty</span>
-                    <span class="comment">// message should be reported as an error. If not, it is just</span>
-                    <span class="comment">// the connection closing gracefully.</span>
-                    <span class="kw">let</span> <span class="ident">must_error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">should_error_on_eof</span>();
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_read</span>();
-                    <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">consume_leading_lines</span>();
-                    <span class="kw">let</span> <span class="ident">was_mid_parse</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">is_parse</span>() <span class="op">||</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">is_empty</span>();
-                    <span class="kw">return</span> <span class="kw">if</span> <span class="ident">was_mid_parse</span> <span class="op">||</span> <span class="ident">must_error</span> {
-                        <span class="comment">// We check if the buf contains the h2 Preface</span>
-                        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;parse error ({}) with {} bytes&quot;</span>, <span class="ident">e</span>, <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">len</span>());
-                        <span class="self">self</span>.<span class="ident">on_parse_error</span>(<span class="ident">e</span>)
-                            .<span class="ident">map</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">Async</span>::<span class="ident">NotReady</span>)
-                    } <span class="kw">else</span> {
-                        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;read eof&quot;</span>);
-                        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>))
-                    };
-                }
-            };
+        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">ParseContext</span> {
+            <span class="ident">cached_headers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>,
+            <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">method</span>,
+        }) {
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">msg</span>)) <span class="op">=&gt;</span> <span class="ident">msg</span>,
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="self">self</span>.<span class="ident">on_read_head_error</span>(<span class="ident">e</span>),
+        };
 
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span>;
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">head</span>;
-            <span class="kw">let</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">decode</span> {
-                <span class="ident">Decode</span>::<span class="ident">Normal</span>(<span class="ident">d</span>) <span class="op">=&gt;</span> {
-                    <span class="ident">d</span>
-                },
-                <span class="ident">Decode</span>::<span class="ident">Final</span>(<span class="ident">d</span>) <span class="op">=&gt;</span> {
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;final decoder, HTTP ending&quot;</span>);
-                    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">d</span>.<span class="ident">is_eof</span>());
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_read</span>();
-                    <span class="ident">d</span>
-                },
-                <span class="ident">Decode</span>::<span class="ident">Ignore</span> <span class="op">=&gt;</span> {
-                    <span class="comment">// likely a 1xx message that we can ignore</span>
-                    <span class="kw">continue</span>;
-                }
-            };
-            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;incoming body is {}&quot;</span>, <span class="ident">decoder</span>);
+        <span class="comment">// Note: don&#39;t deconstruct `msg` into local variables, it appears</span>
+        <span class="comment">// the optimizer doesn&#39;t remove the extra copies.</span>
 
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">busy</span>();
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;incoming body is {}&quot;</span>, <span class="ident">msg</span>.<span class="ident">decode</span>);
+
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">busy</span>();
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">keep_alive</span> <span class="op">&amp;=</span> <span class="ident">msg</span>.<span class="ident">keep_alive</span>;
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span>;
+
+        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">decode</span> <span class="op">==</span> <span class="ident">DecodedLength</span>::<span class="ident">ZERO</span> {
+            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">msg</span>.<span class="ident">expect_continue</span>, <span class="string">&quot;expect-continue needs a body&quot;</span>);
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">KeepAlive</span>;
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">T</span>::<span class="ident">should_read_first</span>() {
+                <span class="self">self</span>.<span class="ident">try_keep_alive</span>();
+            }
+        } <span class="kw">else</span> {
             <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">expect_continue</span> {
                 <span class="kw">let</span> <span class="ident">cont</span> <span class="op">=</span> <span class="string">b&quot;HTTP/1.1 100 Continue\r\n\r\n&quot;</span>;
                 <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">headers_buf</span>().<span class="ident">extend_from_slice</span>(<span class="ident">cont</span>);
             }
-            <span class="kw">let</span> <span class="ident">wants_keep_alive</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">keep_alive</span>;
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">keep_alive</span> <span class="op">&amp;=</span> <span class="ident">wants_keep_alive</span>;
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="ident">Decoder</span>::<span class="ident">new</span>(<span class="ident">msg</span>.<span class="ident">decode</span>));
+        };
 
-            <span class="kw">let</span> <span class="ident">content_length</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">content_length</span>();
+        <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">msg</span>.<span class="ident">head</span>, <span class="ident">msg</span>.<span class="ident">decode</span>, <span class="ident">msg</span>.<span class="ident">wants_upgrade</span>))))
+    }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-                <span class="comment">// actually want an `if not let ...`</span>
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">content_length</span>.<span class="ident">is_none</span>() {
-                    <span class="ident">Reading</span>::<span class="ident">KeepAlive</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="ident">decoder</span>)
-                };
-            }
-            <span class="kw">if</span> <span class="ident">content_length</span>.<span class="ident">is_none</span>() {
-                <span class="self">self</span>.<span class="ident">try_keep_alive</span>();
-            }
-
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">content_length</span>))));
+    <span class="kw">fn</span> <span class="ident">on_read_head_error</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">e</span>: ::<span class="ident">Error</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// If we are currently waiting on a message, then an empty</span>
+        <span class="comment">// message should be reported as an error. If not, it is just</span>
+        <span class="comment">// the connection closing gracefully.</span>
+        <span class="kw">let</span> <span class="ident">must_error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">should_error_on_eof</span>();
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_read</span>();
+        <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">consume_leading_lines</span>();
+        <span class="kw">let</span> <span class="ident">was_mid_parse</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">is_parse</span>() <span class="op">||</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">is_empty</span>();
+        <span class="kw">if</span> <span class="ident">was_mid_parse</span> <span class="op">||</span> <span class="ident">must_error</span> {
+            <span class="comment">// We check if the buf contains the h2 Preface</span>
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;parse error ({}) with {} bytes&quot;</span>, <span class="ident">e</span>, <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">read_buf</span>().<span class="ident">len</span>());
+            <span class="self">self</span>.<span class="ident">on_parse_error</span>(<span class="ident">e</span>)
+                .<span class="ident">map</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">Async</span>::<span class="ident">NotReady</span>)
+        } <span class="kw">else</span> {
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;read eof&quot;</span>);
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>))
         }
     }
 
@@ -1774,6 +1795,10 @@
         }
     }
 
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="ident">upgrade</span>::<span class="ident">OnUpgrade</span> {
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">prepare_upgrade</span>()
+    }
+
     <span class="comment">// Used in h1::dispatch tests</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">io_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span> {
@@ -1811,6 +1836,8 @@
     <span class="ident">reading</span>: <span class="ident">Reading</span>,
     <span class="doccomment">/// State of allowed writes</span>
     <span class="ident">writing</span>: <span class="ident">Writing</span>,
+    <span class="doccomment">/// An expected pending HTTP upgrade.</span>
+    <span class="ident">upgrade</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>::<span class="ident">upgrade</span>::<span class="ident">Pending</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Either HTTP/1.0 or 1.1 connection</span>
     <span class="ident">version</span>: <span class="ident">Version</span>,
 }
@@ -1859,6 +1886,7 @@
 <span class="kw">impl</span> ::<span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">BitAndAssign</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KA</span> {
     <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">enabled</span> {
+            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;remote disabling keep-alive&quot;</span>);
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">KA</span>::<span class="ident">Disabled</span>;
         }
     }
@@ -1983,11 +2011,53 @@
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>
         }
     }
+
+    <span class="kw">fn</span> <span class="ident">prepare_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> ::<span class="ident">upgrade</span>::<span class="ident">OnUpgrade</span> {
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;prepare possible HTTP upgrade&quot;</span>);
+        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">upgrade</span>.<span class="ident">is_none</span>());
+        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> ::<span class="ident">upgrade</span>::<span class="ident">pending</span>();
+        <span class="self">self</span>.<span class="ident">upgrade</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
+        <span class="ident">rx</span>
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="comment">//TODO: rewrite these using dispatch</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bench_read_head_short</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">test</span>::<span class="ident">Bencher</span>) {
+        <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">b&quot;GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n&quot;</span>;
+        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>();
+        <span class="ident">b</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>;
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io</span> <span class="op">=</span> ::<span class="ident">mock</span>::<span class="ident">AsyncIo</span>::<span class="ident">new_buf</span>(<span class="ident">Vec</span>::<span class="ident">new</span>(), <span class="number">0</span>);
+        <span class="ident">io</span>.<span class="ident">panic</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn</span>::<span class="op">&lt;</span><span class="kw">_</span>, ::<span class="ident">Chunk</span>, ::<span class="ident">proto</span>::<span class="ident">h1</span>::<span class="ident">ServerTransaction</span><span class="op">&gt;</span>::<span class="ident">new</span>(<span class="ident">io</span>);
+        <span class="kw-2">*</span><span class="ident">conn</span>.<span class="ident">io</span>.<span class="ident">read_buf_mut</span>() <span class="op">=</span> ::<span class="ident">bytes</span>::<span class="ident">BytesMut</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..]);
+        <span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">HeaderMap</span>::<span class="ident">with_capacity</span>(<span class="number">2</span>));
+
+        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">||</span> {
+            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">read_head</span>().<span class="ident">unwrap</span>() {
+                <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">x</span>)) <span class="op">=&gt;</span> {
+                    ::<span class="ident">test</span>::<span class="ident">black_box</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>);
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">x</span>.<span class="number">0</span>.<span class="ident">headers</span>;
+                    <span class="ident">headers</span>.<span class="ident">clear</span>();
+                    <span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">headers</span>);
+                },
+                <span class="ident">f</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected Ready(Some(..)): {:?}&quot;</span>, <span class="ident">f</span>)
+            }
+
+
+            <span class="ident">conn</span>.<span class="ident">io</span>.<span class="ident">read_buf_mut</span>().<span class="ident">reserve</span>(<span class="number">1</span>);
+            <span class="kw">unsafe</span> {
+                <span class="ident">conn</span>.<span class="ident">io</span>.<span class="ident">read_buf_mut</span>().<span class="ident">set_len</span>(<span class="ident">len</span>);
+            }
+            <span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">Init</span>;
+        });
+    }
     <span class="comment">/*
     use futures::{Async, Future, Stream, Sink};
     use futures::future;

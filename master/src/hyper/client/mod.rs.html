@@ -1076,7 +1076,7 @@
                                 .<span class="ident">h1_writev</span>(<span class="ident">h1_writev</span>)
                                 .<span class="ident">h1_title_case_headers</span>(<span class="ident">h1_title_case_headers</span>)
                                 .<span class="ident">http2_only</span>(<span class="ident">pool_key</span>.<span class="number">1</span> <span class="op">==</span> <span class="ident">Ver</span>::<span class="ident">Http2</span>)
-                                .<span class="ident">handshake_no_upgrades</span>(<span class="ident">io</span>)
+                                .<span class="ident">handshake</span>(<span class="ident">io</span>)
                                 .<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">tx</span>, <span class="ident">conn</span>)<span class="op">|</span> {
                                     <span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">conn</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                                         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;client connection error: {}&quot;</span>, <span class="ident">e</span>)
