@@ -252,13 +252,15 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Upgrades</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! See [this example][example] showing how upgrades work with both</span>
 <span class="doccomment">//! Clients and Servers.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [example]: https://github.com/hyperium/hyper/master/examples/upgrades.rs</span>
+<span class="doccomment">//! [example]: https://github.com/hyperium/hyper/blob/master/examples/upgrades.rs</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">TypeId</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -483,12 +485,14 @@
 
 <span class="kw">impl</span> <span class="ident">Pending</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulfill</span>(<span class="self">self</span>, <span class="ident">upgraded</span>: <span class="ident">Upgraded</span>) {
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;pending upgrade fulfill&quot;</span>);
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">upgraded</span>));
     }
 
     <span class="doccomment">/// Don&#39;t fulfill the pending Upgrade, but instead signal that</span>
     <span class="doccomment">/// upgrades are handled manually.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">manual</span>(<span class="self">self</span>) {
+        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;pending upgrade handled manually&quot;</span>);
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_manual_upgrade</span>()));
     }
 }

@@ -730,7 +730,7 @@
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The types in thie module are to provide a lower-level API based around a</span>
+<span class="doccomment">//! The types in this module are to provide a lower-level API based around a</span>
 <span class="doccomment">//! single connection. Accepting a connection and binding it with a service</span>
 <span class="doccomment">//! are not handled at this level. This module provides the building blocks to</span>
 <span class="doccomment">//! customize those things externally.</span>
@@ -778,14 +778,14 @@
     <span class="ident">pipeline_flush</span>: <span class="ident">bool</span>,
 }
 
-<span class="doccomment">/// The internal mode of HTTP protocol which indicates the behavior when an parse error occurs.</span>
+<span class="doccomment">/// The internal mode of HTTP protocol which indicates the behavior when a parse error occurs.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">enum</span> <span class="ident">ConnectionMode</span> {
-    <span class="doccomment">/// Always use HTTP/1 and do not upgrade when an parse error occurs.</span>
+    <span class="doccomment">/// Always use HTTP/1 and do not upgrade when a parse error occurs.</span>
     <span class="ident">H1Only</span>,
     <span class="doccomment">/// Always use HTTP/2.</span>
     <span class="ident">H2Only</span>,
-    <span class="doccomment">/// Use HTTP/1 and try to upgrade to h2 when an parse error occurs.</span>
+    <span class="doccomment">/// Use HTTP/1 and try to upgrade to h2 when a parse error occurs.</span>
     <span class="ident">Fallback</span>,
 }
 
@@ -947,7 +947,7 @@
 
     <span class="doccomment">/// Aggregates flushes to better support pipelined responses.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Experimental, may be have bugs.</span>
+    <span class="doccomment">/// Experimental, may have bugs.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is false.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pipeline_flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -1371,7 +1371,7 @@
                     <span class="comment">// flatten basically</span>
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">conn</span><span class="op">|</span> <span class="ident">conn</span>.<span class="ident">with_upgrades</span>())
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;conn error: {}&quot;</span>, <span class="ident">err</span>));
-                <span class="self">self</span>.<span class="ident">serve</span>.<span class="ident">protocol</span>.<span class="ident">exec</span>.<span class="ident">execute</span>(<span class="ident">fut</span>);
+                <span class="self">self</span>.<span class="ident">serve</span>.<span class="ident">protocol</span>.<span class="ident">exec</span>.<span class="ident">execute</span>(<span class="ident">fut</span>)<span class="question-mark">?</span>;
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()))
             }

@@ -586,14 +586,10 @@
 <span id="586">586</span>
 <span id="587">587</span>
 <span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level client connection API.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The types in thie module are to provide a lower-level API based around a</span>
+<span class="doccomment">//! The types in this module are to provide a lower-level API based around a</span>
 <span class="doccomment">//! single connection. Connecting to a host, pooling connections, and the like</span>
 <span class="doccomment">//! are not handled at this level. This module provides the building blocks to</span>
 <span class="doccomment">//! customize those things externally.</span>
@@ -770,7 +766,7 @@
     <span class="doccomment">/// does for you that will not be done here:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// - `Client` requires absolute-form `Uri`s, since the scheme and</span>
-    <span class="doccomment">///   authority are need to connect. They aren&#39;t required here.</span>
+    <span class="doccomment">///   authority are needed to connect. They aren&#39;t required here.</span>
     <span class="doccomment">/// - Since the `Client` requires absolute-form `Uri`s, it can add</span>
     <span class="doccomment">///   the `Host` header based on it. You must add a `Host` header yourself</span>
     <span class="doccomment">///   before calling this method.</span>
@@ -831,12 +827,11 @@
         }
     }
 
-    <span class="comment">//TODO: replace with `impl Future` when stable</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_request_retryable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>(::<span class="ident">Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_request_retryable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="macro">impl_trait</span><span class="macro">!</span>(<span class="ident">ty</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> (::<span class="ident">Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Send</span>,
     {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">try_send</span>(<span class="ident">req</span>) {
+        <span class="macro">impl_trait</span><span class="macro">!</span>(<span class="ident">e</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">try_send</span>(<span class="ident">req</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">rx</span>) <span class="op">=&gt;</span> {
                 <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">rx</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
                     <span class="kw">match</span> <span class="ident">res</span> {
@@ -852,8 +847,7 @@
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> ::<span class="ident">Error</span>::<span class="ident">new_canceled</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;connection was not ready&quot;</span>));
                 <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">future</span>::<span class="ident">err</span>((<span class="ident">err</span>, <span class="prelude-val">Some</span>(<span class="ident">req</span>))))
             }
-        };
-        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">inner</span>)
+        })
     }
 }
 
@@ -893,12 +887,11 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">Payload</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="comment">//TODO: replace with `impl Future` when stable</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">send_request_retryable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>(::<span class="ident">Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">send_request_retryable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="macro">impl_trait</span><span class="macro">!</span>(<span class="ident">ty</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">=</span>(::<span class="ident">Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;&gt;</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Send</span>,
     {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">try_send</span>(<span class="ident">req</span>) {
+        <span class="macro">impl_trait</span><span class="macro">!</span>(<span class="ident">e</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">try_send</span>(<span class="ident">req</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">rx</span>) <span class="op">=&gt;</span> {
                 <span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">rx</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
                     <span class="kw">match</span> <span class="ident">res</span> {
@@ -914,8 +907,7 @@ impl&lt;T, B&gt; Service for SendRequest&lt;T, B&gt; {
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> ::<span class="ident">Error</span>::<span class="ident">new_canceled</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;connection was not ready&quot;</span>));
                 <span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">future</span>::<span class="ident">err</span>((<span class="ident">err</span>, <span class="prelude-val">Some</span>(<span class="ident">req</span>))))
             }
-        };
-        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">inner</span>)
+        })
     }
 }
 

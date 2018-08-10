@@ -82,7 +82,7 @@
     <span class="doccomment">/// The future returned from `new_service` of a `Service`.</span>
     <span class="kw">type</span> <span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="self">Self</span>::<span class="ident">Service</span>, <span class="ident">Error</span><span class="op">=</span><span class="self">Self</span>::<span class="ident">InitError</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// The error type that can be returned when creating a new `Service.</span>
+    <span class="doccomment">/// The error type that can be returned when creating a new `Service`.</span>
     <span class="kw">type</span> <span class="ident">InitError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>;
 
     <span class="doccomment">/// Create a new `Service`.</span>

@@ -576,6 +576,12 @@
 <span id="576">576</span>
 <span id="577">577</span>
 <span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -584,6 +590,7 @@
 
 <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
 <span class="kw">use</span> <span class="ident">body</span>::<span class="ident">internal</span>::<span class="ident">FullDataArg</span>;
+<span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Never</span>;
 <span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">DecodedLength</span>, <span class="ident">Conn</span>, <span class="ident">Dispatched</span>, <span class="ident">MessageHead</span>, <span class="ident">RequestHead</span>, <span class="ident">RequestLine</span>, <span class="ident">ResponseHead</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Http1Transaction</span>;
 <span class="kw">use</span> <span class="ident">service</span>::<span class="ident">Service</span>;
@@ -599,8 +606,9 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Dispatch</span> {
     <span class="kw">type</span> <span class="ident">PollItem</span>;
     <span class="kw">type</span> <span class="ident">PollBody</span>;
+    <span class="kw">type</span> <span class="ident">PollError</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span>;
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">PollError</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
@@ -621,6 +629,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Dispatcher</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Dispatch</span><span class="op">&lt;</span><span class="ident">PollItem</span><span class="op">=</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">PollBody</span><span class="op">=</span><span class="ident">Bs</span>, <span class="ident">RecvItem</span><span class="op">=</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">D</span>::<span class="ident">PollError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
     <span class="ident">T</span>: <span class="ident">Http1Transaction</span>,
     <span class="ident">Bs</span>: <span class="ident">Payload</span>,
@@ -810,7 +819,7 @@
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(()));
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">body_rx</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_head</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">should_poll</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="kw-2">mut</span> <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>()) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="kw-2">mut</span> <span class="ident">body</span>)) <span class="op">=</span> <span class="macro">try_ready</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_msg</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_service</span>)) {
                     <span class="comment">// Check if the body knows its full data immediately.</span>
                     <span class="comment">//</span>
                     <span class="comment">// If so, we can skip a bit of bookkeeping that streaming</span>
@@ -911,6 +920,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Dispatcher</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Bs</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Dispatch</span><span class="op">&lt;</span><span class="ident">PollItem</span><span class="op">=</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>, <span class="ident">PollBody</span><span class="op">=</span><span class="ident">Bs</span>, <span class="ident">RecvItem</span><span class="op">=</span><span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">D</span>::<span class="ident">PollError</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
     <span class="ident">T</span>: <span class="ident">Http1Transaction</span>,
     <span class="ident">Bs</span>: <span class="ident">Payload</span>,
@@ -946,11 +956,12 @@
 {
     <span class="kw">type</span> <span class="ident">PollItem</span> <span class="op">=</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">PollBody</span> <span class="op">=</span> <span class="ident">Bs</span>;
+    <span class="kw">type</span> <span class="ident">PollError</span> <span class="op">=</span> <span class="ident">S</span>::<span class="ident">Error</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">RequestHead</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">PollError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">fut</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_flight</span>.<span class="ident">take</span>() {
-            <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll</span>().<span class="ident">map_err</span>(::<span class="ident">Error</span>::<span class="ident">new_user_service</span>)<span class="question-mark">?</span> {
+            <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll</span>()<span class="question-mark">?</span> {
                 <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">res</span>) <span class="op">=&gt;</span> <span class="ident">res</span>,
                 <span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=&gt;</span> {
                     <span class="self">self</span>.<span class="ident">in_flight</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">fut</span>);
@@ -1011,9 +1022,10 @@
 {
     <span class="kw">type</span> <span class="ident">PollItem</span> <span class="op">=</span> <span class="ident">RequestHead</span>;
     <span class="kw">type</span> <span class="ident">PollBody</span> <span class="op">=</span> <span class="ident">B</span>;
+    <span class="kw">type</span> <span class="ident">PollError</span> <span class="op">=</span> <span class="ident">Never</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">ResponseHead</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, ::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="self">Self</span>::<span class="ident">PollItem</span>, <span class="self">Self</span>::<span class="ident">PollBody</span>)<span class="op">&gt;</span>, <span class="ident">Never</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">req</span>, <span class="kw-2">mut</span> <span class="ident">cb</span>)))) <span class="op">=&gt;</span> {
                 <span class="comment">// check that future hasn&#39;t been canceled already</span>

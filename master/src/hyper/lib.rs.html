@@ -63,11 +63,13 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
 </pre><pre class="rust ">
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/hyper/0.12.1&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/hyper/0.12.7&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_debug_implementations</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>), <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
 
 <span class="doccomment">//! # hyper</span>
@@ -87,6 +89,7 @@
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">http</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">httparse</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">iovec</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">itoa</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">net2</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">time</span>;
@@ -117,6 +120,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Chunk</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">server</span>::<span class="ident">Server</span>;
 
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">common</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">mock</span>;
