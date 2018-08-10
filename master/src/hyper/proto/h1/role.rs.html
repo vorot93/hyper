@@ -1530,6 +1530,10 @@
 <span id="1530">1530</span>
 <span id="1531">1531</span>
 <span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
@@ -1800,6 +1804,10 @@
             <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span> {
                 <span class="ident">Version</span>::<span class="ident">HTTP_10</span> <span class="op">=&gt;</span> <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;HTTP/1.0 &quot;</span>),
                 <span class="ident">Version</span>::<span class="ident">HTTP_11</span> <span class="op">=&gt;</span> <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;HTTP/1.1 &quot;</span>),
+                <span class="ident">Version</span>::<span class="ident">HTTP_2</span> <span class="op">=&gt;</span> {
+                    <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;response with HTTP2 version coerced to HTTP/1.1&quot;</span>);
+                    <span class="ident">extend</span>(<span class="ident">dst</span>, <span class="string">b&quot;HTTP/1.1 &quot;</span>);
+                },
                 <span class="kw">_</span> <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
             }
 

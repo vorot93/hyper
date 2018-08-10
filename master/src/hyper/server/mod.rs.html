@@ -284,6 +284,14 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -462,6 +470,14 @@
             <span class="ident">incoming</span>,
             <span class="ident">protocol</span>,
         }
+    }
+
+    <span class="doccomment">/// Sets whether to use keep-alive for HTTP/1 connections.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is `true`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_keepalive</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">protocol</span>.<span class="ident">keep_alive</span>(<span class="ident">val</span>);
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets whether HTTP/1 is required.</span>
