@@ -973,6 +973,18 @@
 <span id="973">973</span>
 <span id="974">974</span>
 <span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Client</span>
 <span class="doccomment">//!</span>
@@ -1729,8 +1741,7 @@
     <span class="ident">keep_alive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
     <span class="ident">h1_title_case_headers</span>: <span class="ident">bool</span>,
-    <span class="comment">//TODO: make use of max_idle config</span>
-    <span class="ident">max_idle</span>: <span class="ident">usize</span>,
+    <span class="ident">max_idle_per_host</span>: <span class="ident">usize</span>,
     <span class="ident">retry_canceled_requests</span>: <span class="ident">bool</span>,
     <span class="ident">set_host</span>: <span class="ident">bool</span>,
     <span class="ident">ver</span>: <span class="ident">Ver</span>,
@@ -1744,7 +1755,7 @@
             <span class="ident">keep_alive_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">90</span>)),
             <span class="ident">h1_writev</span>: <span class="bool-val">true</span>,
             <span class="ident">h1_title_case_headers</span>: <span class="bool-val">false</span>,
-            <span class="ident">max_idle</span>: <span class="number">5</span>,
+            <span class="ident">max_idle_per_host</span>: ::<span class="ident">std</span>::<span class="ident">usize</span>::<span class="ident">MAX</span>,
             <span class="ident">retry_canceled_requests</span>: <span class="bool-val">true</span>,
             <span class="ident">set_host</span>: <span class="bool-val">true</span>,
             <span class="ident">ver</span>: <span class="ident">Ver</span>::<span class="ident">Http1</span>,
@@ -1815,6 +1826,14 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Sets the maximum idle connection per host allowed in the pool.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is `usize::MAX` (no limit).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_per_host</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">max_idle_per_host</span> <span class="op">=</span> <span class="ident">max_idle</span>;
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Set whether to retry requests that get disrupted before ever starting</span>
     <span class="doccomment">/// to write.</span>
     <span class="doccomment">///</span>
@@ -1881,7 +1900,12 @@
             <span class="ident">executor</span>: <span class="self">self</span>.<span class="ident">exec</span>.<span class="ident">clone</span>(),
             <span class="ident">h1_writev</span>: <span class="self">self</span>.<span class="ident">h1_writev</span>,
             <span class="ident">h1_title_case_headers</span>: <span class="self">self</span>.<span class="ident">h1_title_case_headers</span>,
-            <span class="ident">pool</span>: <span class="ident">Pool</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">keep_alive</span>, <span class="self">self</span>.<span class="ident">keep_alive_timeout</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exec</span>),
+            <span class="ident">pool</span>: <span class="ident">Pool</span>::<span class="ident">new</span>(
+                <span class="ident">pool</span>::<span class="ident">Enabled</span>(<span class="self">self</span>.<span class="ident">keep_alive</span>),
+                <span class="ident">pool</span>::<span class="ident">IdleTimeout</span>(<span class="self">self</span>.<span class="ident">keep_alive_timeout</span>),
+                <span class="ident">pool</span>::<span class="ident">MaxIdlePerHost</span>(<span class="self">self</span>.<span class="ident">max_idle_per_host</span>),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exec</span>,
+            ),
             <span class="ident">retry_canceled_requests</span>: <span class="self">self</span>.<span class="ident">retry_canceled_requests</span>,
             <span class="ident">set_host</span>: <span class="self">self</span>.<span class="ident">set_host</span>,
             <span class="ident">ver</span>: <span class="self">self</span>.<span class="ident">ver</span>,
@@ -1895,7 +1919,7 @@
             .<span class="ident">field</span>(<span class="string">&quot;keep_alive&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keep_alive</span>)
             .<span class="ident">field</span>(<span class="string">&quot;keep_alive_timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keep_alive_timeout</span>)
             .<span class="ident">field</span>(<span class="string">&quot;http1_writev&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">h1_writev</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_idle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_idle</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;max_idle_per_host&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_idle_per_host</span>)
             .<span class="ident">field</span>(<span class="string">&quot;set_host&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">set_host</span>)
             .<span class="ident">field</span>(<span class="string">&quot;version&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ver</span>)
             .<span class="ident">finish</span>()
