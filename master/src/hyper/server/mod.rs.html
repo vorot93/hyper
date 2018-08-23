@@ -292,6 +292,67 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! HTTP Server</span>
 <span class="doccomment">//!</span>
@@ -346,6 +407,7 @@
 <span class="doccomment">//! ```</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">conn</span>;
+<span class="kw">mod</span> <span class="ident">shutdown</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">tcp</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -362,6 +424,7 @@
 <span class="comment">// Renamed `Http` as `Http_` for now so that people upgrading don&#39;t see an</span>
 <span class="comment">// error that `hyper::server::Http` is private...</span>
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::{<span class="ident">Http</span> <span class="kw">as</span> <span class="ident">Http_</span>, <span class="ident">SpawnAll</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">shutdown</span>::<span class="ident">Graceful</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">tcp</span>::<span class="ident">AddrIncoming</span>;
 
 <span class="doccomment">/// A listening HTTP server that accepts connections in both HTTP1 and HTTP2 by default.</span>
@@ -431,6 +494,65 @@
     }
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">Stream</span>,
+    <span class="ident">I</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">S</span>::<span class="ident">Service</span>: <span class="ident">Send</span>,
+    <span class="ident">S</span>::<span class="ident">Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&gt;</span>::<span class="ident">Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="ident">B</span>: <span class="ident">Payload</span>,
+{
+    <span class="doccomment">/// Prepares a server to handle graceful shutdown when the provided future</span>
+    <span class="doccomment">/// completes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # extern crate hyper;</span>
+    <span class="doccomment">/// # extern crate futures;</span>
+    <span class="doccomment">/// # use futures::Future;</span>
+    <span class="doccomment">/// # fn main() {}</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;runtime&quot;)]</span>
+    <span class="doccomment">/// # fn run() {</span>
+    <span class="doccomment">/// # use hyper::{Body, Response, Server};</span>
+    <span class="doccomment">/// # use hyper::service::service_fn_ok;</span>
+    <span class="doccomment">/// # let new_service = || {</span>
+    <span class="doccomment">/// #     service_fn_ok(|_req| {</span>
+    <span class="doccomment">/// #         Response::new(Body::from(&quot;Hello World&quot;))</span>
+    <span class="doccomment">/// #     })</span>
+    <span class="doccomment">/// # };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Make a server from the previous examples...</span>
+    <span class="doccomment">/// let server = Server::bind(&amp;([127, 0, 0, 1], 3000).into())</span>
+    <span class="doccomment">///     .serve(new_service);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Prepare some signal for when the server should start</span>
+    <span class="doccomment">/// // shutting down...</span>
+    <span class="doccomment">/// let (tx, rx) = futures::sync::oneshot::channel::&lt;()&gt;();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let graceful = server</span>
+    <span class="doccomment">///     .with_graceful_shutdown(rx)</span>
+    <span class="doccomment">///     .map_err(|err| eprintln!(&quot;server error: {}&quot;, err));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Spawn `server` onto an Executor...</span>
+    <span class="doccomment">/// hyper::rt::spawn(graceful);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // And later, trigger the signal by calling `tx.send(())`.</span>
+    <span class="doccomment">/// let _ = tx.send(());</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_graceful_shutdown</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">signal</span>: <span class="ident">F</span>) <span class="op">-&gt;</span> <span class="ident">Graceful</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span>()<span class="op">&gt;</span>
+    {
+        <span class="ident">Graceful</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">spawn_all</span>, <span class="ident">signal</span>)
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
@@ -447,7 +569,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ::<span class="ident">Error</span>;
 
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">spawn_all</span>.<span class="ident">poll</span>()
+        <span class="self">self</span>.<span class="ident">spawn_all</span>.<span class="ident">poll_with</span>(<span class="op">||</span> <span class="op">|</span><span class="ident">conn</span><span class="op">|</span> <span class="ident">conn</span>)
     }
 }
 
