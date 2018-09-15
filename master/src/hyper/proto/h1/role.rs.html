@@ -1534,6 +1534,11 @@
 <span id="1534">1534</span>
 <span id="1535">1535</span>
 <span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
@@ -2480,6 +2485,8 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
         <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">&gt;=</span> <span class="string">b&#39;a&#39;</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">&lt;=</span> <span class="string">b&#39;z&#39;</span> {
             <span class="ident">dst</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span> <span class="op">^</span> <span class="string">b&#39; &#39;</span>);
+        } <span class="kw">else</span> {
+            <span class="ident">dst</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span>);
         }
     }
 
@@ -2490,6 +2497,8 @@
           <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
               <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">&gt;=</span> <span class="string">b&#39;a&#39;</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">&lt;=</span> <span class="string">b&#39;z&#39;</span> {
                   <span class="ident">dst</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span> <span class="op">^</span> <span class="string">b&#39; &#39;</span>);
+              } <span class="kw">else</span> {
+                  <span class="ident">dst</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">c</span>);
               }
           }
       }
@@ -2908,6 +2917,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">MessageHead</span>::<span class="ident">default</span>();
         <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="string">&quot;content-length&quot;</span>, <span class="ident">HeaderValue</span>::<span class="ident">from_static</span>(<span class="string">&quot;10&quot;</span>));
         <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="string">&quot;content-type&quot;</span>, <span class="ident">HeaderValue</span>::<span class="ident">from_static</span>(<span class="string">&quot;application/json&quot;</span>));
+        <span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">insert</span>(<span class="string">&quot;*-*&quot;</span>, <span class="ident">HeaderValue</span>::<span class="ident">from_static</span>(<span class="string">&quot;o_o&quot;</span>));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="ident">Client</span>::<span class="ident">encode</span>(<span class="ident">Encode</span> {
@@ -2918,7 +2928,7 @@
             <span class="ident">title_case_headers</span>: <span class="bool-val">true</span>,
         }, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">vec</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>, <span class="string">b&quot;GET / HTTP/1.1\r\nContent-Length: 10\r\nContent-Type: application/json\r\n\r\n&quot;</span>.<span class="ident">to_vec</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>, <span class="string">b&quot;GET / HTTP/1.1\r\nContent-Length: 10\r\nContent-Type: application/json\r\n*-*: o_o\r\n\r\n&quot;</span>.<span class="ident">to_vec</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
