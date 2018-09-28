@@ -976,6 +976,23 @@
 <span id="976">976</span>
 <span id="977">977</span>
 <span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -991,6 +1008,8 @@
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">Exec</span>;
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Ver</span>;
 
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span>,
 }
@@ -1013,6 +1032,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Specifically, HTTP/1 requires a unique reservation, but HTTP/2 can be</span>
 <span class="doccomment">/// used for multiple requests.</span>
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">Reservation</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// This connection could be used multiple times, the first one will be</span>
     <span class="doccomment">/// reinserted into the `idle` pool, and the second will be given to</span>
@@ -1024,7 +1045,7 @@
 }
 
 <span class="doccomment">/// Simple type alias in case the key type needs to be adjusted.</span>
-<span class="kw">type</span> <span class="ident">Key</span> <span class="op">=</span> (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Ver</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">Key</span> <span class="op">=</span> (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Ver</span>);
 
 <span class="kw">struct</span> <span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">connections</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Connections</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span>,
@@ -1064,8 +1085,17 @@
 <span class="kw">struct</span> <span class="ident">WeakOpt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span>);
 
 <span class="comment">// Newtypes to act as keyword arguments for `Pool::new`...</span>
+
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Enabled</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">bool</span>);
+
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">IdleTimeout</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>);
+
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">MaxIdlePerHost</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">usize</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
@@ -1572,6 +1602,8 @@
     <span class="ident">value</span>: <span class="ident">T</span>,
 }
 
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Checkout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">key</span>: <span class="ident">Key</span>,
     <span class="ident">pool</span>: <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -1641,6 +1673,8 @@
     }
 }
 
+<span class="comment">// FIXME: allow() required due to `impl Trait` leaking types to this lint</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Connecting</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> {
     <span class="ident">key</span>: <span class="ident">Key</span>,
     <span class="ident">pool</span>: <span class="ident">WeakOpt</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;&gt;</span>,
