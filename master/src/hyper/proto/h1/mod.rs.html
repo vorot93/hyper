@@ -77,7 +77,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">io</span>::<span class="ident">MINIMUM_MAX_BUFFER_SIZE</span>;
 
 <span class="kw">mod</span> <span class="ident">conn</span>;
-<span class="kw">mod</span> <span class="ident">date</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">date</span>;
 <span class="kw">mod</span> <span class="ident">decode</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">dispatch</span>;
 <span class="kw">mod</span> <span class="ident">encode</span>;

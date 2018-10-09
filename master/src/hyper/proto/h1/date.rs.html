@@ -71,11 +71,22 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
 
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">header</span>::<span class="ident">HeaderValue</span>;
 <span class="kw">use</span> <span class="ident">time</span>::{<span class="self">self</span>, <span class="ident">Duration</span>};
 
 <span class="comment">// &quot;Sun, 06 Nov 1994 08:49:37 GMT&quot;.len()</span>
@@ -90,6 +101,15 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>() {
     <span class="ident">CACHED</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cache</span><span class="op">|</span> {
         <span class="ident">cache</span>.<span class="ident">borrow_mut</span>().<span class="ident">check</span>();
+    })
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_and_header_value</span>() <span class="op">-&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="ident">CACHED</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cache</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">borrow_mut</span>();
+        <span class="ident">cache</span>.<span class="ident">check</span>();
+        <span class="ident">HeaderValue</span>::<span class="ident">from_bytes</span>(<span class="ident">cache</span>.<span class="ident">buffer</span>())
+            .<span class="ident">expect</span>(<span class="string">&quot;Date format should be valid HeaderValue&quot;</span>)
     })
 }
 
