@@ -873,7 +873,6 @@
 <span id="873">873</span>
 <span id="874">874</span>
 <span id="875">875</span>
-<span id="876">876</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
@@ -1185,10 +1184,9 @@
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">Bd</span><span class="op">&gt;</span>,
         <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
-        <span class="comment">//S::Future: Send + &#39;static,</span>
         <span class="ident">Bd</span>: <span class="ident">Payload</span>,
         <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
-        <span class="ident">E</span>: <span class="ident">H2Exec</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Future</span>, <span class="ident">Bd</span><span class="op">&gt;</span><span class="comment">//Box&lt;Future&lt;Item=(), Error=()&gt; + Send&gt;&gt;,</span>
+        <span class="ident">E</span>: <span class="ident">H2Exec</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="ident">Future</span>, <span class="ident">Bd</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">either</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mode</span> {
             <span class="ident">ConnectionMode</span>::<span class="ident">H1Only</span> <span class="op">|</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span> <span class="op">=&gt;</span> {
