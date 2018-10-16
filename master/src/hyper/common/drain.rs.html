@@ -113,6 +113,7 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 
@@ -152,6 +153,7 @@
     <span class="ident">rx</span>: <span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;&gt;</span>,
 }
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Watching</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FN</span><span class="op">&gt;</span> {
     <span class="ident">future</span>: <span class="ident">F</span>,
     <span class="ident">state</span>: <span class="ident">State</span><span class="op">&lt;</span><span class="ident">FN</span><span class="op">&gt;</span>,
