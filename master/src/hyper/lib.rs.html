@@ -86,7 +86,7 @@
 <span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">futures</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">futures_cpupool</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">h2</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">http</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span> <span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">http</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">httparse</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">iovec</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">itoa</span>;
