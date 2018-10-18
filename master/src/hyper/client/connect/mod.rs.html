@@ -485,6 +485,102 @@
 <span id="485">485</span>
 <span id="486">486</span>
 <span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! The `Connect` trait, and supporting types.</span>
 <span class="doccomment">//!</span>
@@ -755,7 +851,11 @@ pub(super) enum Alpn {
 
     <span class="doccomment">/// Set extra connection information to be set in the extensions of every `Response`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extra</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">extra</span>: <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">Connected</span> {
-        <span class="self">self</span>.<span class="ident">extra</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Extra</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">ExtraEnvelope</span>(<span class="ident">extra</span>))));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prev</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">extra</span> {
+            <span class="self">self</span>.<span class="ident">extra</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Extra</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">ExtraChain</span>(<span class="ident">prev</span>.<span class="number">0</span>, <span class="ident">extra</span>))));
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">extra</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Extra</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">ExtraEnvelope</span>(<span class="ident">extra</span>))));
+        }
         <span class="self">self</span>
     }
 
@@ -799,16 +899,16 @@ pub(super) enum Alpn {
     }
 }
 
+<span class="kw">trait</span> <span class="ident">ExtraInner</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExtraInner</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Response</span><span class="op">&lt;</span>::<span class="ident">Body</span><span class="op">&gt;</span>);
+}
+
 <span class="comment">// This indirection allows the `Connected` to have a type-erased &quot;extra&quot; value,</span>
 <span class="comment">// while that type still knows its inner extra type. This allows the correct</span>
 <span class="comment">// TypeId to be used when inserting into `res.extensions_mut()`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">ExtraEnvelope</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
-
-<span class="kw">trait</span> <span class="ident">ExtraInner</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExtraInner</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Response</span><span class="op">&lt;</span>::<span class="ident">Body</span><span class="op">&gt;</span>);
-}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExtraInner</span> <span class="kw">for</span> <span class="ident">ExtraEnvelope</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -819,14 +919,35 @@ pub(super) enum Alpn {
     }
 
     <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Response</span><span class="op">&lt;</span>::<span class="ident">Body</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="ident">res</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">extra</span>);
+        <span class="ident">res</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>());
+    }
+}
+
+<span class="kw">struct</span> <span class="ident">ExtraChain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExtraInner</span><span class="op">&gt;</span>, <span class="ident">T</span>);
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ExtraChain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">ExtraChain</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone_box</span>(), <span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>())
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExtraInner</span> <span class="kw">for</span> <span class="ident">ExtraChain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+{
+    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExtraInner</span><span class="op">&gt;</span> {
+        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Response</span><span class="op">&lt;</span>::<span class="ident">Body</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set</span>(<span class="ident">res</span>);
+        <span class="ident">res</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>());
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Destination</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Connected</span>, <span class="ident">Destination</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_destination_set_scheme</span>() {
@@ -970,6 +1091,77 @@ pub(super) enum Alpn {
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dst</span>.<span class="ident">scheme</span>(), <span class="string">&quot;http&quot;</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dst</span>.<span class="ident">host</span>(), <span class="string">&quot;hyper.rs&quot;</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dst</span>.<span class="ident">port</span>(), <span class="prelude-val">None</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+    <span class="kw">struct</span> <span class="ident">Ex1</span>(<span class="ident">usize</span>);
+
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+    <span class="kw">struct</span> <span class="ident">Ex2</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
+
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+    <span class="kw">struct</span> <span class="ident">Ex3</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_connected_extra</span>() {
+        <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">Connected</span>::<span class="ident">new</span>()
+            .<span class="ident">extra</span>(<span class="ident">Ex1</span>(<span class="number">41</span>));
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res1</span> <span class="op">=</span> ::<span class="ident">Response</span>::<span class="ident">new</span>(::<span class="ident">Body</span>::<span class="ident">empty</span>());
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex1</span><span class="op">&gt;</span>(), <span class="prelude-val">None</span>);
+
+        <span class="ident">c1</span>
+            .<span class="ident">extra</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;c1 extra&quot;</span>)
+            .<span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res1</span>);
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex1</span><span class="op">&gt;</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Ex1</span>(<span class="number">41</span>)));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_connected_extra_chain</span>() {
+        <span class="comment">// If a user composes connectors and at each stage, there&#39;s &quot;extra&quot;</span>
+        <span class="comment">// info to attach, it shouldn&#39;t override the previous extras.</span>
+
+        <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">Connected</span>::<span class="ident">new</span>()
+            .<span class="ident">extra</span>(<span class="ident">Ex1</span>(<span class="number">45</span>))
+            .<span class="ident">extra</span>(<span class="ident">Ex2</span>(<span class="string">&quot;zoom&quot;</span>))
+            .<span class="ident">extra</span>(<span class="ident">Ex3</span>(<span class="string">&quot;pew pew&quot;</span>));
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res1</span> <span class="op">=</span> ::<span class="ident">Response</span>::<span class="ident">new</span>(::<span class="ident">Body</span>::<span class="ident">empty</span>());
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex1</span><span class="op">&gt;</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex2</span><span class="op">&gt;</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex3</span><span class="op">&gt;</span>(), <span class="prelude-val">None</span>);
+
+        <span class="ident">c1</span>
+            .<span class="ident">extra</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;c1 extra&quot;</span>)
+            .<span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res1</span>);
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex1</span><span class="op">&gt;</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Ex1</span>(<span class="number">45</span>)));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex2</span><span class="op">&gt;</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Ex2</span>(<span class="string">&quot;zoom&quot;</span>)));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res1</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex3</span><span class="op">&gt;</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Ex3</span>(<span class="string">&quot;pew pew&quot;</span>)));
+
+        <span class="comment">// Just like extensions, inserting the same type overrides previous type.</span>
+        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">Connected</span>::<span class="ident">new</span>()
+            .<span class="ident">extra</span>(<span class="ident">Ex1</span>(<span class="number">33</span>))
+            .<span class="ident">extra</span>(<span class="ident">Ex2</span>(<span class="string">&quot;hiccup&quot;</span>))
+            .<span class="ident">extra</span>(<span class="ident">Ex1</span>(<span class="number">99</span>));
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res2</span> <span class="op">=</span> ::<span class="ident">Response</span>::<span class="ident">new</span>(::<span class="ident">Body</span>::<span class="ident">empty</span>());
+
+        <span class="ident">c2</span>
+            .<span class="ident">extra</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;c2 extra&quot;</span>)
+            .<span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res2</span>);
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res2</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex1</span><span class="op">&gt;</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Ex1</span>(<span class="number">99</span>)));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res2</span>.<span class="ident">extensions</span>().<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">Ex2</span><span class="op">&gt;</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Ex2</span>(<span class="string">&quot;hiccup&quot;</span>)));
     }
 }
 
