@@ -484,6 +484,7 @@
 <span id="484">484</span>
 <span id="485">485</span>
 <span id="486">486</span>
+<span id="487">487</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! The `Connect` trait, and supporting types.</span>
 <span class="doccomment">//!</span>
@@ -502,6 +503,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">dns</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">http</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">dns</span>::{<span class="ident">GaiResolver</span>, <span class="ident">Name</span>, <span class="ident">Resolve</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">http</span>::{<span class="ident">HttpConnector</span>, <span class="ident">HttpInfo</span>};
 
 <span class="doccomment">/// Connect to a destination, returning an IO transport.</span>
