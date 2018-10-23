@@ -580,7 +580,6 @@
 <span id="580">580</span>
 <span id="581">581</span>
 <span id="582">582</span>
-<span id="583">583</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! The `Connect` trait, and supporting types.</span>
 <span class="doccomment">//!</span>
@@ -597,9 +596,8 @@
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">uri</span>, <span class="ident">Response</span>, <span class="ident">Uri</span>};
 <span class="kw">use</span> <span class="ident">tokio_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">dns</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dns</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">mod</span> <span class="ident">http</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">dns</span>::{<span class="ident">GaiResolver</span>, <span class="ident">Name</span>, <span class="ident">Resolve</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">http</span>::{<span class="ident">HttpConnector</span>, <span class="ident">HttpInfo</span>};
 
 <span class="doccomment">/// Connect to a destination, returning an IO transport.</span>

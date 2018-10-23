@@ -307,7 +307,26 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
 </pre><pre class="rust ">
+<span class="doccomment">//! The `Resolve` trait, support types, and some basic implementations.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This module contains:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - A [`GaiResolver`](GaiResolver) that is the default resolver for the</span>
+<span class="doccomment">//!   `HttpConnector`.</span>
+<span class="doccomment">//! - The [`Resolve`](Resolve) trait and related types to build a custom</span>
+<span class="doccomment">//!   resolver for use with the `HttpConnector`.</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">io</span>, <span class="ident">vec</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{
     <span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>,
@@ -320,11 +339,9 @@
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::{<span class="ident">Executor</span>, <span class="ident">ExecuteError</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">oneshot</span>;
 <span class="kw">use</span> <span class="ident">futures_cpupool</span>::{<span class="ident">Builder</span> <span class="kw">as</span> <span class="ident">CpuPoolBuilder</span>};
+<span class="kw">use</span> <span class="ident">tokio_threadpool</span>;
 
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">sealed</span>::<span class="ident">GaiTask</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">blocking</span>::{<span class="ident">TokioThreadpoolGaiFuture</span>, <span class="ident">TokioThreadpoolGaiResolver</span>};
 
 <span class="doccomment">/// Resolve a hostname to a set of IP addresses.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Resolve</span> {
@@ -347,10 +364,12 @@
     <span class="ident">executor</span>: <span class="ident">GaiExecutor</span>,
 }
 
+<span class="doccomment">/// An iterator of IP addresses returned from `getaddrinfo`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaiAddrs</span> {
     <span class="ident">inner</span>: <span class="ident">IpAddrs</span>,
 }
 
+<span class="doccomment">/// A future to resole a name returned by `GaiResolver`.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GaiFuture</span> {
     <span class="ident">rx</span>: <span class="ident">oneshot</span>::<span class="ident">SpawnHandle</span><span class="op">&lt;</span><span class="ident">IpAddrs</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
 }
@@ -552,46 +571,49 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">blocking</span> {
-    <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">ToSocketAddrs</span>;
-    <span class="kw">use</span> <span class="ident">tokio_threadpool</span>;
 
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Name</span>, <span class="ident">IpAddrs</span>, <span class="ident">GaiAddrs</span>, <span class="ident">Resolve</span>};
+<span class="doccomment">/// A resolver using `getaddrinfo` calls via the `tokio_threadpool::blocking` API.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Unlike the `GaiResolver` this will not spawn dedicated threads, but only works when running on the</span>
+<span class="doccomment">/// multi-threaded Tokio runtime.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokioThreadpoolGaiResolver</span>(());
 
-    <span class="doccomment">/// A resolver using `getaddrinfo` calls via the `tokio_threadpool::blocking` API.</span>
-    <span class="doccomment">/// </span>
-    <span class="doccomment">/// Unlike the `GaiResolver` this will not spawn dedicated threads, but only works when running on the</span>
-    <span class="doccomment">/// multi-threaded Tokio runtime.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokioThreadpoolGaiResolver</span>(());
+<span class="doccomment">/// The future returned by `TokioThreadpoolGaiResolver`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokioThreadpoolGaiFuture</span> {
+    <span class="ident">name</span>: <span class="ident">Name</span>,
+}
 
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokioThreadpoolGaiFuture</span> {
-        <span class="ident">name</span>: <span class="ident">Name</span>,
+<span class="kw">impl</span> <span class="ident">TokioThreadpoolGaiResolver</span> {
+    <span class="doccomment">/// Creates a new DNS resolver that will use tokio threadpool&#39;s blocking</span>
+    <span class="doccomment">/// feature.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Requires** its futures to be run on the threadpool runtime.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">TokioThreadpoolGaiResolver</span>(())
     }
+}
 
-    <span class="kw">impl</span> <span class="ident">Resolve</span> <span class="kw">for</span> <span class="ident">TokioThreadpoolGaiResolver</span> {
-        <span class="kw">type</span> <span class="ident">Addrs</span> <span class="op">=</span> <span class="ident">GaiAddrs</span>;
-        <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">TokioThreadpoolGaiFuture</span>;
+<span class="kw">impl</span> <span class="ident">Resolve</span> <span class="kw">for</span> <span class="ident">TokioThreadpoolGaiResolver</span> {
+    <span class="kw">type</span> <span class="ident">Addrs</span> <span class="op">=</span> <span class="ident">GaiAddrs</span>;
+    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">TokioThreadpoolGaiFuture</span>;
 
-        <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-&gt;</span> <span class="ident">TokioThreadpoolGaiFuture</span> {
-            <span class="ident">TokioThreadpoolGaiFuture</span> { <span class="ident">name</span> }
-        }
+    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-&gt;</span> <span class="ident">TokioThreadpoolGaiFuture</span> {
+        <span class="ident">TokioThreadpoolGaiFuture</span> { <span class="ident">name</span> }
     }
+}
 
-    <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">TokioThreadpoolGaiFuture</span> {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">GaiAddrs</span>;
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>;
+<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">TokioThreadpoolGaiFuture</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">GaiAddrs</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io</span>::<span class="ident">Error</span>;
 
-        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">GaiAddrs</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="ident">tokio_threadpool</span>::<span class="ident">blocking</span>(<span class="op">||</span> (<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="number">0</span>).<span class="ident">to_socket_addrs</span>()) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">iter</span>))) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">GaiAddrs</span> { <span class="ident">inner</span>: <span class="ident">IpAddrs</span> { <span class="ident">iter</span> } })),
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="ident">e</span>)),
-            }
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">GaiAddrs</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">tokio_threadpool</span>::<span class="ident">blocking</span>(<span class="op">||</span> (<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="number">0</span>).<span class="ident">to_socket_addrs</span>()) {
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">iter</span>))) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">GaiAddrs</span> { <span class="ident">inner</span>: <span class="ident">IpAddrs</span> { <span class="ident">iter</span> } })),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="ident">e</span>)),
         }
     }
 }

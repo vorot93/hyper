@@ -736,6 +736,15 @@
 <span id="736">736</span>
 <span id="737">737</span>
 <span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -754,7 +763,7 @@
 <span class="kw">use</span> <span class="ident">tokio_timer</span>::<span class="ident">Delay</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Connect</span>, <span class="ident">Connected</span>, <span class="ident">Destination</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">dns</span>::{<span class="self">self</span>, <span class="ident">GaiResolver</span>, <span class="ident">Resolve</span>};
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">dns</span>::{<span class="self">self</span>, <span class="ident">GaiResolver</span>, <span class="ident">Resolve</span>, <span class="ident">TokioThreadpoolGaiResolver</span>};
 
 <span class="doccomment">/// A connector for the `http` scheme.</span>
 <span class="doccomment">///</span>
@@ -835,6 +844,15 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">HttpConnector</span>::<span class="ident">new_with_resolver</span>(<span class="ident">resolver</span>);
         <span class="ident">http</span>.<span class="ident">set_reactor</span>(<span class="ident">handle</span>);
         <span class="ident">http</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">HttpConnector</span><span class="op">&lt;</span><span class="ident">TokioThreadpoolGaiResolver</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Construct a new HttpConnector using the `TokioThreadpoolGaiResolver`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This resolver **requires** the threadpool runtime to be used.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_tokio_threadpool_resolver</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">HttpConnector</span>::<span class="ident">new_with_resolver</span>(<span class="ident">TokioThreadpoolGaiResolver</span>::<span class="ident">new</span>())
     }
 }
 
