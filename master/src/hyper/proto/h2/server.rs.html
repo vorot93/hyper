@@ -264,14 +264,6 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
 <span class="kw">use</span> <span class="ident">h2</span>::<span class="ident">Reason</span>;
@@ -409,16 +401,8 @@
             <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">stream</span><span class="op">|</span> {
                 ::<span class="ident">Body</span>::<span class="ident">h2</span>(<span class="ident">stream</span>, <span class="ident">content_length</span>)
             });
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">H2Stream</span>::<span class="ident">new</span>(<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>), <span class="ident">respond</span>);
-
-            <span class="comment">// try to eagerly poll the future, so that we might</span>
-            <span class="comment">// not need to allocate a new task...</span>
-            <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">|</span> <span class="prelude-val">Err</span>(()) <span class="op">=&gt;</span> (),
-                <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
-                    <span class="ident">exec</span>.<span class="ident">execute_h2stream</span>(<span class="ident">fut</span>)<span class="question-mark">?</span>;
-                }
-            }
+            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">H2Stream</span>::<span class="ident">new</span>(<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>), <span class="ident">respond</span>);
+            <span class="ident">exec</span>.<span class="ident">execute_h2stream</span>(<span class="ident">fut</span>)<span class="question-mark">?</span>;
         }
 
         <span class="comment">// no more incoming streams...</span>
