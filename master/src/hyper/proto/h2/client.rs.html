@@ -166,6 +166,14 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">IntoBuf</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Async</span>, <span class="ident">Future</span>, <span class="ident">Poll</span>, <span class="ident">Stream</span>};
@@ -291,14 +299,22 @@
                                 }
                             };
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">eos</span> {
-                                <span class="kw">let</span> <span class="ident">conn_drop_ref</span> <span class="op">=</span> <span class="ident">conn_dropper</span>.<span class="ident">clone</span>();
-                                <span class="kw">let</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">PipeToSendStream</span>::<span class="ident">new</span>(<span class="ident">body</span>, <span class="ident">body_tx</span>)
-                                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;client request body error: {}&quot;</span>, <span class="ident">e</span>))
-                                    .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
-                                        <span class="ident">drop</span>(<span class="ident">conn_drop_ref</span>);
-                                        <span class="ident">x</span>
-                                    });
-                                <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">pipe</span>)<span class="question-mark">?</span>;
+                                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">PipeToSendStream</span>::<span class="ident">new</span>(<span class="ident">body</span>, <span class="ident">body_tx</span>)
+                                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;client request body error: {}&quot;</span>, <span class="ident">e</span>));
+
+                                <span class="comment">// eagerly see if the body pipe is ready and</span>
+                                <span class="comment">// can thus skip allocating in the executor</span>
+                                <span class="kw">match</span> <span class="ident">pipe</span>.<span class="ident">poll</span>() {
+                                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(())) <span class="op">|</span> <span class="prelude-val">Err</span>(()) <span class="op">=&gt;</span> (),
+                                    <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=&gt;</span> {
+                                        <span class="kw">let</span> <span class="ident">conn_drop_ref</span> <span class="op">=</span> <span class="ident">conn_dropper</span>.<span class="ident">clone</span>();
+                                        <span class="kw">let</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">pipe</span>.<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
+                                                <span class="ident">drop</span>(<span class="ident">conn_drop_ref</span>);
+                                                <span class="ident">x</span>
+                                            });
+                                        <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">execute</span>(<span class="ident">pipe</span>)<span class="question-mark">?</span>;
+                                    }
+                                }
                             }
 
                             <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">fut</span>
