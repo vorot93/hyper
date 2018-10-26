@@ -1825,7 +1825,7 @@
         <span class="kw">let</span> (<span class="ident">ret</span>, <span class="kw-2">mut</span> <span class="ident">is_last</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_upgrade</span> {
             (<span class="prelude-val">Ok</span>(()), <span class="bool-val">true</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span>.<span class="ident">is_informational</span>() {
-            <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;response with 1xx status code not supported&quot;</span>);
+            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;response with 1xx status code not supported&quot;</span>);
             <span class="kw-2">*</span><span class="ident">msg</span>.<span class="ident">head</span> <span class="op">=</span> <span class="ident">MessageHead</span>::<span class="ident">default</span>();
             <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">subject</span> <span class="op">=</span> <span class="ident">StatusCode</span>::<span class="ident">INTERNAL_SERVER_ERROR</span>;
             <span class="ident">msg</span>.<span class="ident">body</span> <span class="op">=</span> <span class="prelude-val">None</span>;
