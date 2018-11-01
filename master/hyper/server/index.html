@@ -12,7 +12,7 @@ It wraps a listener with a <a href="../../hyper/service/index.html"><code>NewSer
 be executed to start serving requests.</p>
 <p><a href="../../hyper/server/struct.Server.html"><code>Server</code></a> accepts connections in both HTTP1 and HTTP2 by default.</p>
 <h2 id="example" class="section-header"><a href="#example">Example</a></h2>
-<pre class="rust rust-example-rendered">
+<div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">hyper</span>;
 
 <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Response</span>, <span class="ident">Server</span>};
@@ -37,7 +37,7 @@ be executed to start serving requests.</p>
     <span class="ident">hyper</span>::<span class="ident">rt</span>::<span class="ident">run</span>(<span class="ident">server</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
         <span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;server error: {}&quot;</span>, <span class="ident">e</span>);
     }));
-}</pre>
+}</pre></div>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
