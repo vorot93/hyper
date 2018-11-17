@@ -8,7 +8,7 @@ them off to a <code>Service</code>.</p>
 </ul>
 <h1 id="server" class="section-header"><a href="#server">Server</a></h1>
 <p>The <a href="../../hyper/server/struct.Server.html"><code>Server</code></a> is main way to start listening for HTTP requests.
-It wraps a listener with a <a href="../../hyper/service/index.html"><code>NewService</code></a>, and then should
+It wraps a listener with a <a href="../../hyper/service/index.html"><code>MakeService</code></a>, and then should
 be executed to start serving requests.</p>
 <p><a href="../../hyper/server/struct.Server.html"><code>Server</code></a> accepts connections in both HTTP1 and HTTP2 by default.</p>
 <h2 id="example" class="section-header"><a href="#example">Example</a></h2>
@@ -22,8 +22,8 @@ be executed to start serving requests.</p>
     <span class="comment">// Construct our SocketAddr to listen on...</span>
     <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> ([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>], <span class="number">3000</span>).<span class="ident">into</span>();
 
-    <span class="comment">// And a NewService to handle each connection...</span>
-    <span class="kw">let</span> <span class="ident">new_service</span> <span class="op">=</span> <span class="op">||</span> {
+    <span class="comment">// And a MakeService to handle each connection...</span>
+    <span class="kw">let</span> <span class="ident">make_service</span> <span class="op">=</span> <span class="op">||</span> {
         <span class="ident">service_fn_ok</span>(<span class="op">|</span><span class="ident">_req</span><span class="op">|</span> {
             <span class="ident">Response</span>::<span class="ident">new</span>(<span class="ident">Body</span>::<span class="ident">from</span>(<span class="string">&quot;Hello World&quot;</span>))
         })
@@ -31,7 +31,7 @@ be executed to start serving requests.</p>
 
     <span class="comment">// Then bind and serve...</span>
     <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">Server</span>::<span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>)
-        .<span class="ident">serve</span>(<span class="ident">new_service</span>);
+        .<span class="ident">serve</span>(<span class="ident">make_service</span>);
 
     <span class="comment">// Finally, spawn `server` onto an Executor...</span>
     <span class="ident">hyper</span>::<span class="ident">rt</span>::<span class="ident">run</span>(<span class="ident">server</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {

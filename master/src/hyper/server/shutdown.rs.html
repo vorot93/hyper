@@ -124,8 +124,8 @@
 <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">drain</span>::{<span class="self">self</span>, <span class="ident">Draining</span>, <span class="ident">Signal</span>, <span class="ident">Watch</span>, <span class="ident">Watching</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">exec</span>::{<span class="ident">H2Exec</span>, <span class="ident">NewSvcExec</span>};
-<span class="kw">use</span> <span class="ident">service</span>::{<span class="ident">Service</span>, <span class="ident">NewService</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">conn</span>::{<span class="ident">SpawnAll</span>, <span class="ident">UpgradeableConnection</span>, <span class="ident">Watcher</span>};
+<span class="kw">use</span> <span class="ident">service</span>::<span class="ident">Service</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">conn</span>::{<span class="ident">MakeServiceRef</span>, <span class="ident">SpawnAll</span>, <span class="ident">UpgradeableConnection</span>, <span class="ident">Watcher</span>};
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Graceful</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span> {
@@ -160,7 +160,7 @@
     <span class="ident">I</span>: <span class="ident">Stream</span>,
     <span class="ident">I</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="ident">S</span>: <span class="ident">MakeServiceRef</span><span class="op">&lt;</span><span class="ident">I</span>::<span class="ident">Item</span>, <span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
     <span class="ident">S</span>::<span class="ident">Service</span>: <span class="lifetime">&#39;static</span>,
     <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">B</span>: <span class="ident">Payload</span>,

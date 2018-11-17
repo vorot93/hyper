@@ -380,7 +380,7 @@
 <span class="doccomment">//! # Server</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Server`](Server) is main way to start listening for HTTP requests.</span>
-<span class="doccomment">//! It wraps a listener with a [`NewService`](::service), and then should</span>
+<span class="doccomment">//! It wraps a listener with a [`MakeService`](::service), and then should</span>
 <span class="doccomment">//! be executed to start serving requests.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`Server`](Server) accepts connections in both HTTP1 and HTTP2 by default.</span>
@@ -399,8 +399,8 @@
 <span class="doccomment">//!     // Construct our SocketAddr to listen on...</span>
 <span class="doccomment">//!     let addr = ([127, 0, 0, 1], 3000).into();</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!     // And a NewService to handle each connection...</span>
-<span class="doccomment">//!     let new_service = || {</span>
+<span class="doccomment">//!     // And a MakeService to handle each connection...</span>
+<span class="doccomment">//!     let make_service = || {</span>
 <span class="doccomment">//!         service_fn_ok(|_req| {</span>
 <span class="doccomment">//!             Response::new(Body::from(&quot;Hello World&quot;))</span>
 <span class="doccomment">//!         })</span>
@@ -408,7 +408,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Then bind and serve...</span>
 <span class="doccomment">//!     let server = Server::bind(&amp;addr)</span>
-<span class="doccomment">//!         .serve(new_service);</span>
+<span class="doccomment">//!         .serve(make_service);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     // Finally, spawn `server` onto an Executor...</span>
 <span class="doccomment">//!     hyper::rt::run(server.map_err(|e| {</span>
@@ -434,10 +434,10 @@
 
 <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">exec</span>::{<span class="ident">Exec</span>, <span class="ident">H2Exec</span>, <span class="ident">NewSvcExec</span>};
-<span class="kw">use</span> <span class="ident">service</span>::{<span class="ident">NewService</span>, <span class="ident">Service</span>};
+<span class="kw">use</span> <span class="ident">service</span>::<span class="ident">Service</span>;
 <span class="comment">// Renamed `Http` as `Http_` for now so that people upgrading don&#39;t see an</span>
 <span class="comment">// error that `hyper::server::Http` is private...</span>
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::{<span class="ident">Http</span> <span class="kw">as</span> <span class="ident">Http_</span>, <span class="ident">NoopWatcher</span>, <span class="ident">SpawnAll</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::{<span class="ident">Http</span> <span class="kw">as</span> <span class="ident">Http_</span>, <span class="ident">MakeServiceRef</span>, <span class="ident">NoopWatcher</span>, <span class="ident">SpawnAll</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">shutdown</span>::{<span class="ident">Graceful</span>, <span class="ident">GracefulWatcher</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">tcp</span>::<span class="ident">AddrIncoming</span>;
 
@@ -513,7 +513,7 @@
     <span class="ident">I</span>: <span class="ident">Stream</span>,
     <span class="ident">I</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="ident">S</span>: <span class="ident">MakeServiceRef</span><span class="op">&lt;</span><span class="ident">I</span>::<span class="ident">Item</span>, <span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
     <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">S</span>::<span class="ident">Service</span>: <span class="lifetime">&#39;static</span>,
     <span class="ident">B</span>: <span class="ident">Payload</span>,
@@ -572,7 +572,7 @@
     <span class="ident">I</span>: <span class="ident">Stream</span>,
     <span class="ident">I</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="ident">S</span>: <span class="ident">MakeServiceRef</span><span class="op">&lt;</span><span class="ident">I</span>::<span class="ident">Item</span>, <span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
     <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
     <span class="ident">S</span>::<span class="ident">Service</span>: <span class="lifetime">&#39;static</span>,
     <span class="ident">B</span>: <span class="ident">Payload</span>,
@@ -701,7 +701,7 @@
         <span class="ident">I</span>: <span class="ident">Stream</span>,
         <span class="ident">I</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
         <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">S</span>: <span class="ident">NewService</span><span class="op">&lt;</span><span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
+        <span class="ident">S</span>: <span class="ident">MakeServiceRef</span><span class="op">&lt;</span><span class="ident">I</span>::<span class="ident">Item</span>, <span class="ident">ReqBody</span><span class="op">=</span><span class="ident">Body</span>, <span class="ident">ResBody</span><span class="op">=</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">S</span>::<span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>::<span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;&gt;</span>,
         <span class="ident">S</span>::<span class="ident">Service</span>: <span class="lifetime">&#39;static</span>,
         <span class="ident">B</span>: <span class="ident">Payload</span>,
