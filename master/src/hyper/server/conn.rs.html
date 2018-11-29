@@ -924,6 +924,26 @@
 <span id="924">924</span>
 <span id="925">925</span>
 <span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Lower-level Server connection API.</span>
 <span class="doccomment">//!</span>
@@ -972,6 +992,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">E</span> <span class="op">=</span> <span class="ident">Exec</span><span class="op">&gt;</span> {
     <span class="ident">exec</span>: <span class="ident">E</span>,
+    <span class="ident">h1_half_close</span>: <span class="ident">bool</span>,
     <span class="ident">h1_writev</span>: <span class="ident">bool</span>,
     <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>,
     <span class="ident">keep_alive</span>: <span class="ident">bool</span>,
@@ -1090,6 +1111,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Http</span> {
         <span class="ident">Http</span> {
             <span class="ident">exec</span>: <span class="ident">Exec</span>::<span class="ident">Default</span>,
+            <span class="ident">h1_half_close</span>: <span class="bool-val">true</span>,
             <span class="ident">h1_writev</span>: <span class="bool-val">true</span>,
             <span class="ident">mode</span>: <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>,
             <span class="ident">keep_alive</span>: <span class="bool-val">true</span>,
@@ -1119,6 +1141,20 @@
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">mode</span> <span class="op">=</span> <span class="ident">ConnectionMode</span>::<span class="ident">Fallback</span>;
         }
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set whether HTTP/1 connections should support half-closures.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Clients can chose to shutdown their write-side while waiting</span>
+    <span class="doccomment">/// for the server to respond. Setting this to `false` will</span>
+    <span class="doccomment">/// automatically close any connection immediately if `read`</span>
+    <span class="doccomment">/// detects an EOF.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Default is `true`.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_half_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">h1_half_close</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
@@ -1188,6 +1224,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_executor</span><span class="op">&lt;</span><span class="ident">E2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">exec</span>: <span class="ident">E2</span>) <span class="op">-&gt;</span> <span class="ident">Http</span><span class="op">&lt;</span><span class="ident">E2</span><span class="op">&gt;</span> {
         <span class="ident">Http</span> {
             <span class="ident">exec</span>,
+            <span class="ident">h1_half_close</span>: <span class="self">self</span>.<span class="ident">h1_half_close</span>,
             <span class="ident">h1_writev</span>: <span class="self">self</span>.<span class="ident">h1_writev</span>,
             <span class="ident">mode</span>: <span class="self">self</span>.<span class="ident">mode</span>,
             <span class="ident">keep_alive</span>: <span class="self">self</span>.<span class="ident">keep_alive</span>,
@@ -1245,6 +1282,9 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">proto</span>::<span class="ident">Conn</span>::<span class="ident">new</span>(<span class="ident">io</span>);
                 <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">keep_alive</span> {
                     <span class="ident">conn</span>.<span class="ident">disable_keep_alive</span>();
+                }
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">h1_half_close</span> {
+                    <span class="ident">conn</span>.<span class="ident">set_disable_half_close</span>();
                 }
                 <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">h1_writev</span> {
                     <span class="ident">conn</span>.<span class="ident">set_write_strategy_flatten</span>();
