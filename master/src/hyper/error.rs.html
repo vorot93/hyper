@@ -391,8 +391,6 @@
 <span id="391">391</span>
 <span id="392">392</span>
 <span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Error and Result module.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -493,13 +491,6 @@ pub(crate) enum User {
 */</span>
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="comment">//TODO(error): should there be these kinds of inspection methods?</span>
-    <span class="comment">//</span>
-    <span class="comment">// - is_io()</span>
-    <span class="comment">// - is_connect()</span>
-    <span class="comment">// - is_closed()</span>
-    <span class="comment">// - etc?</span>
-
     <span class="doccomment">/// Returns true if this was an HTTP parse error.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_parse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">kind</span> {
@@ -533,6 +524,11 @@ pub(crate) enum User {
     <span class="doccomment">/// Returns true if a sender&#39;s channel is closed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">Kind</span>::<span class="ident">Closed</span>
+    }
+
+    <span class="doccomment">/// Returns true if this was an error from `Connect`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">Kind</span>::<span class="ident">Connect</span>
     }
 
     <span class="doccomment">/// Returns the error&#39;s cause.</span>
