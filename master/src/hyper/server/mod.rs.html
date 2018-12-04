@@ -468,10 +468,10 @@
 
 <span class="kw">use</span> <span class="ident">body</span>::{<span class="ident">Body</span>, <span class="ident">Payload</span>};
 <span class="kw">use</span> <span class="ident">common</span>::<span class="ident">exec</span>::{<span class="ident">Exec</span>, <span class="ident">H2Exec</span>, <span class="ident">NewSvcExec</span>};
-<span class="kw">use</span> <span class="ident">service</span>::<span class="ident">Service</span>;
+<span class="kw">use</span> <span class="ident">service</span>::{<span class="ident">MakeServiceRef</span>, <span class="ident">Service</span>};
 <span class="comment">// Renamed `Http` as `Http_` for now so that people upgrading don&#39;t see an</span>
 <span class="comment">// error that `hyper::server::Http` is private...</span>
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::{<span class="ident">Http</span> <span class="kw">as</span> <span class="ident">Http_</span>, <span class="ident">MakeServiceRef</span>, <span class="ident">NoopWatcher</span>, <span class="ident">SpawnAll</span>};
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">conn</span>::{<span class="ident">Http</span> <span class="kw">as</span> <span class="ident">Http_</span>, <span class="ident">NoopWatcher</span>, <span class="ident">SpawnAll</span>};
 <span class="kw">use</span> <span class="self">self</span>::<span class="ident">shutdown</span>::{<span class="ident">Graceful</span>, <span class="ident">GracefulWatcher</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">tcp</span>::<span class="ident">AddrIncoming</span>;
 
