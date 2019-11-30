@@ -915,7 +915,6 @@ mod tests {
     #[cfg(feature = "runtime")]
     #[test]
     fn test_pool_timer_removes_expired() {
-        use std::time::Instant;
         use tokio::time::delay_for;
         let mut rt = Runtime::new().unwrap();
         let pool = Pool::new(super::Config {

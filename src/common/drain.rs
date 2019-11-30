@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn watch() {
-        tokio_test::task::mock(|cx| {
+        tokio_test::task::spawn(|_| ()).enter(|(cx, _)| {
             let (tx, rx) = channel();
             let fut = TestMe {
                 draining: false,
@@ -198,7 +198,7 @@ mod tests {
 
     #[test]
     fn watch_clones() {
-        tokio_test::task::mock(|cx| {
+        tokio_test::task::spawn(|_| ()).enter(|cx| {
             let (tx, rx) = channel();
 
             let fut1 = TestMe {
@@ -234,7 +234,7 @@ mod tests {
 
             // Now all watchers are gone, draining is complete
             assert!(Pin::new(&mut draining).poll(cx).is_ready());
-        });
+        })
     }
 }
 

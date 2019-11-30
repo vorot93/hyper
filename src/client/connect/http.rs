@@ -8,9 +8,7 @@ use std::time::Duration;
 
 use http::uri::{Scheme, Uri};
 use futures_util::{TryFutureExt, FutureExt};
-use net2::TcpBuilder;
 use pin_project::{pin_project, project};
-use tokio::net::driver::Handle;
 use tokio::net::TcpStream;
 use tokio::time::{Delay, Timeout};
 
@@ -73,7 +71,6 @@ pub struct HttpInfo {
 struct Config {
     connect_timeout: Option<Duration>,
     enforce_http: bool,
-    handle: Option<Handle>,
     happy_eyeballs_timeout: Option<Duration>,
     keep_alive_timeout: Option<Duration>,
     local_address: Option<IpAddr>,
@@ -112,7 +109,6 @@ impl<R> HttpConnector<R> {
             config: Arc::new(Config {
                 connect_timeout: None,
                 enforce_http: true,
-                handle: None,
                 happy_eyeballs_timeout: Some(Duration::from_millis(300)),
                 keep_alive_timeout: None,
                 local_address: None,
@@ -131,14 +127,6 @@ impl<R> HttpConnector<R> {
     #[inline]
     pub fn enforce_http(&mut self, is_enforced: bool) {
         self.config_mut().enforce_http = is_enforced;
-    }
-
-    /// Set a handle to a `Reactor` to register connections to.
-    ///
-    /// If `None`, the implicit default reactor will be used.
-    #[inline]
-    pub fn set_reactor(&mut self, handle: Option<Handle>) {
-        self.config_mut().handle = handle;
     }
 
     /// Set that all sockets have `SO_KEEPALIVE` set with the supplied duration.
@@ -560,7 +548,6 @@ impl ConnectingTcpRemote {
         &mut self,
         cx: &mut task::Context<'_>,
         local_addr: &Option<IpAddr>,
-        handle: &Option<Handle>,
         reuse_address: bool,
     ) -> Poll<io::Result<TcpStream>> {
         let mut err = None;
@@ -596,45 +583,12 @@ impl ConnectingTcpRemote {
 fn connect(
     addr: &SocketAddr,
     local_addr: &Option<IpAddr>,
-    handle: &Option<Handle>,
     reuse_address: bool,
     connect_timeout: Option<Duration>,
 ) -> io::Result<ConnectFuture> {
-    let builder = match addr {
-        &SocketAddr::V4(_) => TcpBuilder::new_v4()?,
-        &SocketAddr::V6(_) => TcpBuilder::new_v6()?,
-    };
-
-    if reuse_address {
-        builder.reuse_address(reuse_address)?;
-    }
-
-    if let Some(ref local_addr) = *local_addr {
-        // Caller has requested this socket be bound before calling connect
-        builder.bind(SocketAddr::new(local_addr.clone(), 0))?;
-    } else if cfg!(windows) {
-        // Windows requires a socket be bound before calling connect
-        let any: SocketAddr = match addr {
-            &SocketAddr::V4(_) => {
-                ([0, 0, 0, 0], 0).into()
-            },
-            &SocketAddr::V6(_) => {
-                ([0, 0, 0, 0, 0, 0, 0, 0], 0).into()
-            }
-        };
-        builder.bind(any)?;
-    }
-
-    let handle = match *handle {
-        Some(ref handle) => handle.clone(),
-        None => Handle::default(),
-    };
     let addr = *addr;
-
-    let std_tcp = builder.to_tcp_stream()?;
-
     Ok(Box::pin(async move {
-        let connect = TcpStream::connect_std(std_tcp, &addr, &handle);
+        let connect = TcpStream::connect(&addr);
         match connect_timeout {
             Some(timeout) => match Timeout::new(connect, timeout).await {
                 Ok(Ok(s)) => Ok(s),
@@ -647,16 +601,16 @@ fn connect(
 }
 
 impl ConnectingTcp {
-    fn poll(&mut self, cx: &mut task::Context<'_>, handle: &Option<Handle>) -> Poll<io::Result<TcpStream>> {
+    fn poll(&mut self, cx: &mut task::Context<'_>) -> Poll<io::Result<TcpStream>> {
         match self.fallback.take() {
-            None => self.preferred.poll(cx, &self.local_addr, handle, self.reuse_address),
-            Some(mut fallback) => match self.preferred.poll(cx, &self.local_addr, handle, self.reuse_address) {
+            None => self.preferred.poll(cx, &self.local_addr, self.reuse_address),
+            Some(mut fallback) => match self.preferred.poll(cx, &self.local_addr, self.reuse_address) {
                 Poll::Ready(Ok(stream)) => {
                     // Preferred successful - drop fallback.
                     Poll::Ready(Ok(stream))
                 }
                 Poll::Pending => match Pin::new(&mut fallback.delay).poll(cx) {
-                    Poll::Ready(()) => match fallback.remote.poll(cx, &self.local_addr, handle, self.reuse_address) {
+                    Poll::Ready(()) => match fallback.remote.poll(cx, &self.local_addr, self.reuse_address) {
                         Poll::Ready(Ok(stream)) => {
                             // Fallback successful - drop current preferred,
                             // but keep fallback as new preferred.

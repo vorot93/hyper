@@ -605,8 +605,7 @@ mod tests {
     fn client_read_bytes_before_writing_request() {
         let _ = pretty_env_logger::try_init();
 
-        tokio_test::task::mock(|cx| {
-
+        tokio_test::task::spawn(|_| ()).enter(|cx| {
             let (io, mut handle) = tokio_test::io::Builder::new()
                 .build_with_handle();
 
@@ -634,15 +633,14 @@ mod tests {
                 (&crate::error::Kind::Canceled, Some(_)) => (),
                 other => panic!("expected Canceled, got {:?}", other),
             }
-        });
+        })
     }
 
     #[test]
     fn body_empty_chunks_ignored() {
         let _ = pretty_env_logger::try_init();
 
-        tokio_test::clock::mock(|_timer| {
-            tokio_test::task::mock(|cx| {
+        tokio_test::task::spawn(|_| ()).enter(|cx| {
                 let io = tokio_test::io::Builder::new()
                     // no reading or writing, just be blocked for the test...
                     .wait(Duration::from_secs(5))
@@ -666,7 +664,6 @@ mod tests {
                 // Ensure conn.write_body wasn't called with the empty chunk.
                 // If it is, it will trigger an assertion.
                 assert!(Pin::new(&mut dispatcher).poll(cx).is_pending());
-            });
-        });
+            })
     }
 }

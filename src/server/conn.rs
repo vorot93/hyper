@@ -18,7 +18,6 @@ use bytes::Bytes;
 use futures_core::Stream;
 use tokio::io::{AsyncRead, AsyncWrite};
 use pin_project::{pin_project, project};
-#[cfg(feature = "tcp")] use tokio::net::driver::Handle;
 
 use crate::body::{Body, Payload};
 use crate::common::exec::{Exec, H2Exec, NewSvcExec};
@@ -436,28 +435,6 @@ impl<E> Http<E> {
         E: H2Exec<<S::Service as HttpService<Body>>::Future, Bd>,
     {
         let mut incoming = AddrIncoming::new(addr, None)?;
-        if self.keep_alive {
-            incoming.set_keepalive(Some(Duration::from_secs(90)));
-        }
-        Ok(self.serve_incoming(incoming, make_service))
-    }
-
-    #[cfg(feature = "tcp")]
-    #[doc(hidden)]
-    #[deprecated]
-    #[allow(deprecated)]
-    pub fn serve_addr_handle<S, Bd>(&self, addr: &SocketAddr, handle: &Handle, make_service: S) -> crate::Result<Serve<AddrIncoming, S, E>>
-    where
-        S: MakeServiceRef<
-            AddrStream,
-            Body,
-            ResBody=Bd,
-        >,
-        S::Error: Into<Box<dyn StdError + Send + Sync>>,
-        Bd: Payload,
-        E: H2Exec<<S::Service as HttpService<Body>>::Future, Bd>,
-    {
-        let mut incoming = AddrIncoming::new(addr, Some(handle))?;
         if self.keep_alive {
             incoming.set_keepalive(Some(Duration::from_secs(90)));
         }

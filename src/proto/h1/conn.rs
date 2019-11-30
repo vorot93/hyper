@@ -902,8 +902,8 @@ impl State {
 #[cfg(test)]
 mod tests {
     #[cfg(feature = "nightly")]
-    #[bench]
-    fn bench_read_head_short(b: &mut ::test::Bencher) {
+    #[tokio::bench]
+    async fn bench_read_head_short(b: &mut ::test::Bencher) {
         use super::*;
         let s = b"GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
         let len = s.len();
@@ -915,10 +915,8 @@ mod tests {
         *conn.io.read_buf_mut() = ::bytes::BytesMut::from(&s[..]);
         conn.state.cached_headers = Some(HeaderMap::with_capacity(2));
 
-        let mut rt = tokio::runtime::current_thread::Runtime::new().unwrap();
-
         b.iter(|| {
-            rt.block_on(futures_util::future::poll_fn(|cx| {
+            futures_util::future::poll_fn(|cx| {
                 match conn.poll_read_head(cx) {
                     Poll::Ready(Some(Ok(x))) => {
                         ::test::black_box(&x);
@@ -936,7 +934,7 @@ mod tests {
                 }
                 conn.state.reading = Reading::Init;
                 Poll::Ready(())
-            }));
+            }).await;
         });
     }
 

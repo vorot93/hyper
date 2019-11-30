@@ -1,9 +1,6 @@
 use std::fmt;
 use std::future::Future;
 use std::pin::Pin;
-use std::sync::Arc;
-
-use tokio::executor::{SpawnError, TypedExecutor};
 
 use crate::body::{Payload, Body};
 use crate::proto::h2::server::H2Stream;
@@ -20,25 +17,11 @@ pub trait NewSvcExec<I, N, S: HttpService<Body>, E, W: Watcher<I, S, E>>: Clone 
 
 type BoxFuture = Pin<Box<dyn Future<Output=()> + Send>>;
 
-pub trait SharedExecutor {
-    fn shared_spawn(&self, future: BoxFuture) -> Result<(), SpawnError>;
-}
-
-impl<E> SharedExecutor for E
-where
-    for<'a> &'a E: tokio::executor::Executor,
-{
-    fn shared_spawn(mut self: &Self, future: BoxFuture) -> Result<(), SpawnError> {
-        tokio::executor::Executor::spawn(&mut self, future)
-    }
-}
-
 // Either the user provides an executor for background tasks, or we use
 // `tokio::spawn`.
 #[derive(Clone)]
 pub enum Exec {
     Default,
-    Executor(Arc<dyn SharedExecutor + Send + Sync>),
 }
 
 // ===== impl Exec =====
@@ -86,13 +69,6 @@ impl Exec {
                     // If no runtime, we need an executor!
                     panic!("executor must be set")
                 }
-            },
-            Exec::Executor(ref e) => {
-                e.shared_spawn(Box::pin(fut))
-                    .map_err(|err| {
-                        warn!("executor error: {:?}", err);
-                        crate::Error::new_execute("custom executor failed")
-                    })
             },
         }
     }
