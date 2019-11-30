@@ -497,12 +497,12 @@ mod tests {
         let mut outs = Vec::new();
 
         let mut ins = if block_at == 0 {
-            tokio::test::io::Builder::new()
+            tokio_test::io::Builder::new()
                 .wait(Duration::from_millis(10))
                 .read(content)
                 .build()
         } else {
-            tokio::test::io::Builder::new()
+            tokio_test::io::Builder::new()
                 .read(&content[..block_at])
                 .wait(Duration::from_millis(10))
                 .read(&content[block_at..])

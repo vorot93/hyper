@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn watch() {
-        tokio::test::task::mock(|cx| {
+        tokio_test::task::mock(|cx| {
             let (tx, rx) = channel();
             let fut = TestMe {
                 draining: false,
@@ -198,7 +198,7 @@ mod tests {
 
     #[test]
     fn watch_clones() {
-        tokio::test::task::mock(|cx| {
+        tokio_test::task::mock(|cx| {
             let (tx, rx) = channel();
 
             let fut1 = TestMe {

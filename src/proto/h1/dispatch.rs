@@ -605,9 +605,9 @@ mod tests {
     fn client_read_bytes_before_writing_request() {
         let _ = pretty_env_logger::try_init();
 
-        tokio::test::task::mock(|cx| {
+        tokio_test::task::mock(|cx| {
 
-            let (io, mut handle) = tokio::test::io::Builder::new()
+            let (io, mut handle) = tokio_test::io::Builder::new()
                 .build_with_handle();
 
             // Block at 0 for now, but we will release this response before
@@ -626,8 +626,8 @@ mod tests {
 
             let mut res_rx = tx.try_send(crate::Request::new(crate::Body::empty())).unwrap();
 
-            tokio::test::assert_ready_ok!(Pin::new(&mut dispatcher).poll(cx));
-            let err = tokio::test::assert_ready_ok!(Pin::new(&mut res_rx).poll(cx))
+            tokio_test::assert_ready_ok!(Pin::new(&mut dispatcher).poll(cx));
+            let err = tokio_test::assert_ready_ok!(Pin::new(&mut res_rx).poll(cx))
                 .expect_err("callback should send error");
 
             match (err.0.kind(), err.1) {
@@ -641,9 +641,9 @@ mod tests {
     fn body_empty_chunks_ignored() {
         let _ = pretty_env_logger::try_init();
 
-        tokio::test::clock::mock(|_timer| {
-            tokio::test::task::mock(|cx| {
-                let io = tokio::test::io::Builder::new()
+        tokio_test::clock::mock(|_timer| {
+            tokio_test::task::mock(|cx| {
+                let io = tokio_test::io::Builder::new()
                     // no reading or writing, just be blocked for the test...
                     .wait(Duration::from_secs(5))
                     .build();

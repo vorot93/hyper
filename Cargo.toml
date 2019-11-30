@@ -35,6 +35,7 @@ pin-project = "0.4"
 time = "0.1"
 tower-service = "=0.3.0-alpha.2"
 tokio = { version = "0.2", features = ["full"] }
+tokio-test = "0.2"
 want = "0.3"
 
 # Optional

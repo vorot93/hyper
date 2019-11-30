@@ -103,7 +103,7 @@ mod tests {
     async fn partial_rewind() {
         let underlying = [104, 101, 108, 108, 111];
 
-        let mock = tokio::test::io::Builder::new()
+        let mock = tokio_test::io::Builder::new()
             .read(&underlying)
             .build();
 
@@ -134,7 +134,7 @@ mod tests {
     async fn full_rewind() {
         let underlying = [104, 101, 108, 108, 111];
 
-        let mock = tokio::test::io::Builder::new()
+        let mock = tokio_test::io::Builder::new()
             .read(&underlying)
             .build();
 

@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 
 use futures_channel::oneshot;
 #[cfg(feature = "runtime")]
-use tokio::timer::Interval;
+use tokio::time::Interval;
 
 use crate::common::{Exec, Future, Pin, Poll, Unpin, task};
 use super::Ver;
@@ -916,7 +916,7 @@ mod tests {
     #[test]
     fn test_pool_timer_removes_expired() {
         use std::time::Instant;
-        use tokio::timer::delay;
+        use tokio::time::delay_for;
         let mut rt = Runtime::new().unwrap();
         let pool = Pool::new(super::Config {
                 enabled: true,
@@ -941,8 +941,7 @@ mod tests {
 
         // Let the timer tick passed the expiration...
         rt.block_on(async {
-            let deadline = Instant::now() + Duration::from_millis(200);
-            delay(deadline).await;
+            delay_for(Duration::from_millis(200)).await;
         });
 
         assert!(pool.locked().idle.get(&key).is_none());

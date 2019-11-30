@@ -12,7 +12,7 @@ use net2::TcpBuilder;
 use pin_project::{pin_project, project};
 use tokio::net::driver::Handle;
 use tokio::net::TcpStream;
-use tokio::timer::{Delay, Timeout};
+use tokio::time::{Delay, Timeout};
 
 use crate::common::{Future, Pin, Poll, task};
 use super::{Connected, Destination};
@@ -515,7 +515,7 @@ impl ConnectingTcp {
                 local_addr,
                 preferred: ConnectingTcpRemote::new(preferred_addrs, connect_timeout),
                 fallback: Some(ConnectingTcpFallback {
-                    delay: tokio::timer::delay_for(fallback_timeout),
+                    delay: tokio::time::delay_for(fallback_timeout),
                     remote: ConnectingTcpRemote::new(fallback_addrs, connect_timeout),
                 }),
                 reuse_address,

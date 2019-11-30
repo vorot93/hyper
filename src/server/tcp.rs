@@ -6,7 +6,7 @@ use std::time::Duration;
 use futures_util::FutureExt as _;
 use tokio::net::driver::Handle;
 use tokio::net::TcpListener;
-use tokio::timer::Delay;
+use tokio::time::Delay;
 
 use crate::common::{Future, Pin, Poll, task};
 
@@ -135,7 +135,7 @@ impl AddrIncoming {
                         error!("accept error: {}", e);
 
                         // Sleep 1s.
-                        let mut timeout = tokio::timer::delay_for(Duration::from_secs(1));
+                        let mut timeout = tokio::time::delay_for(Duration::from_secs(1));
 
                         match Pin::new(&mut timeout).poll(cx) {
                             Poll::Ready(()) => {
