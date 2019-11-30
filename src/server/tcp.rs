@@ -4,9 +4,9 @@ use std::net::{SocketAddr, TcpListener as StdTcpListener};
 use std::time::Duration;
 
 use futures_util::FutureExt as _;
-use tokio_net::driver::Handle;
-use tokio_net::tcp::TcpListener;
-use tokio_timer::Delay;
+use tokio::net::driver::Handle;
+use tokio::net::TcpListener;
+use tokio::timer::Delay;
 
 use crate::common::{Future, Pin, Poll, task};
 
@@ -135,7 +135,7 @@ impl AddrIncoming {
                         error!("accept error: {}", e);
 
                         // Sleep 1s.
-                        let mut timeout = tokio_timer::delay_for(Duration::from_secs(1));
+                        let mut timeout = tokio::timer::delay_for(Duration::from_secs(1));
 
                         match Pin::new(&mut timeout).poll(cx) {
                             Poll::Ready(()) => {
@@ -197,8 +197,8 @@ mod addr_stream {
     use std::io;
     use std::net::SocketAddr;
     use bytes::{Buf, BufMut};
-    use tokio_net::tcp::TcpStream;
-    use tokio_io::{AsyncRead, AsyncWrite};
+    use tokio::net::TcpStream;
+    use tokio::io::{AsyncRead, AsyncWrite};
 
     use crate::common::{Pin, Poll, task};
 

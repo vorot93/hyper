@@ -2,7 +2,7 @@ use futures_channel::{mpsc, oneshot};
 use futures_util::future::{self, FutureExt as _, TryFutureExt as _, Either};
 use futures_util::stream::StreamExt as _;
 use h2::client::{Builder, SendRequest};
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 
 use crate::headers::content_length_parse_all;
 use crate::body::Payload;

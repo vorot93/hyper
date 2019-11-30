@@ -1013,7 +1013,7 @@ impl Builder {
     /// Provide an executor to execute background `Connection` tasks.
     pub fn executor<E>(&mut self, exec: E) -> &mut Self
     where
-        for<'a> &'a E: tokio_executor::Executor,
+        for<'a> &'a E: tokio::executor::Executor,
         E: Send + Sync + 'static,
     {
         self.conn_builder.executor(exec);

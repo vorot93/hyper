@@ -328,7 +328,7 @@ impl StdError for IncompleteBody {
 mod tests {
     use std::time::Duration;
     use std::pin::Pin;
-    use tokio_io::AsyncRead;
+    use tokio::io::AsyncRead;
     use super::*;
 
     impl<'a> MemRead for &'a [u8] {
@@ -497,12 +497,12 @@ mod tests {
         let mut outs = Vec::new();
 
         let mut ins = if block_at == 0 {
-            tokio_test::io::Builder::new()
+            tokio::test::io::Builder::new()
                 .wait(Duration::from_millis(10))
                 .read(content)
                 .build()
         } else {
-            tokio_test::io::Builder::new()
+            tokio::test::io::Builder::new()
                 .read(&content[..block_at])
                 .wait(Duration::from_millis(10))
                 .read(&content[block_at..])

@@ -10,9 +10,9 @@ use http::uri::{Scheme, Uri};
 use futures_util::{TryFutureExt, FutureExt};
 use net2::TcpBuilder;
 use pin_project::{pin_project, project};
-use tokio_net::driver::Handle;
-use tokio_net::tcp::TcpStream;
-use tokio_timer::{Delay, Timeout};
+use tokio::net::driver::Handle;
+use tokio::net::TcpStream;
+use tokio::timer::{Delay, Timeout};
 
 use crate::common::{Future, Pin, Poll, task};
 use super::{Connected, Destination};
@@ -515,7 +515,7 @@ impl ConnectingTcp {
                 local_addr,
                 preferred: ConnectingTcpRemote::new(preferred_addrs, connect_timeout),
                 fallback: Some(ConnectingTcpFallback {
-                    delay: tokio_timer::delay_for(fallback_timeout),
+                    delay: tokio::timer::delay_for(fallback_timeout),
                     remote: ConnectingTcpRemote::new(fallback_addrs, connect_timeout),
                 }),
                 reuse_address,
@@ -693,7 +693,7 @@ impl ConnectingTcp {
 mod tests {
     use std::io;
 
-    use tokio_net::driver::Handle;
+    use tokio::net::driver::Handle;
 
     use super::{Connected, Destination, HttpConnector};
     use super::super::sealed::Connect;

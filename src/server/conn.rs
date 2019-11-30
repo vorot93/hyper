@@ -16,9 +16,9 @@ use std::mem;
 
 use bytes::Bytes;
 use futures_core::Stream;
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 use pin_project::{pin_project, project};
-#[cfg(feature = "tcp")] use tokio_net::driver::Handle;
+#[cfg(feature = "tcp")] use tokio::net::driver::Handle;
 
 use crate::body::{Body, Payload};
 use crate::common::exec::{Exec, H2Exec, NewSvcExec};
@@ -357,7 +357,7 @@ impl<E> Http<E> {
     /// # use hyper::{Body, Request, Response};
     /// # use hyper::service::Service;
     /// # use hyper::server::conn::Http;
-    /// # use tokio_io::{AsyncRead, AsyncWrite};
+    /// # use tokio::io::{AsyncRead, AsyncWrite};
     /// # async fn run<I, S>(some_io: I, some_service: S)
     /// # where
     /// #     I: AsyncRead + AsyncWrite + Unpin + Send + 'static,
@@ -876,7 +876,7 @@ where
 
 pub(crate) mod spawn_all {
     use std::error::Error as StdError;
-    use tokio_io::{AsyncRead, AsyncWrite};
+    use tokio::io::{AsyncRead, AsyncWrite};
 
     use crate::body::{Body, Payload};
     use crate::common::exec::H2Exec;

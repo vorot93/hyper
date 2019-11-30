@@ -21,10 +21,10 @@ use futures_util::stream::StreamExt as _;
 // TODO: remove once tokio is updated to futures 0.3
 use futures_util_a19::stream::StreamExt as _;
 use http::header::{HeaderName, HeaderValue};
-use tokio_net::driver::Handle;
-use tokio_net::tcp::{TcpListener, TcpStream as TkTcpStream};
+use tokio::net::driver::Handle;
+use tokio::net::{TcpListener, TcpStream as TkTcpStream};
 use tokio::runtime::current_thread::Runtime;
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 
 use hyper::{Body, Request, Response, StatusCode, Version};
 use hyper::client::Client;
@@ -959,7 +959,7 @@ fn disable_keep_alive_post_request() {
     // the read-blocked socket.
     //
     // See https://github.com/carllerche/mio/issues/776
-    let timeout = tokio_timer::delay_for(Duration::from_millis(10));
+    let timeout = tokio::timer::delay_for(Duration::from_millis(10));
     rt.block_on(timeout);
     assert!(dropped.load());
     child.join().unwrap();
@@ -1031,7 +1031,7 @@ fn http1_allow_half_close() {
             Http::new()
                 .http1_half_close(true)
                 .serve_connection(socket, service_fn(|_| {
-                    tokio_timer::delay_for(Duration::from_millis(500))
+                    tokio::timer::delay_for(Duration::from_millis(500))
                         .map(|_| Ok::<_, hyper::Error>(Response::new(Body::empty())))
                 }))
         });
@@ -1060,7 +1060,7 @@ fn disconnect_after_reading_request_before_responding() {
             Http::new()
                 .http1_half_close(false)
                 .serve_connection(socket, service_fn(|_| {
-                    tokio_timer::delay_for(Duration::from_secs(2))
+                    tokio::timer::delay_for(Duration::from_secs(2))
                         .map(|_| -> Result<Response<Body>, hyper::Error> {
                             panic!("response future should have been dropped");
                         })

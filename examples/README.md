@@ -19,7 +19,7 @@ parses it with serde and outputs the result.
 
 * [`proxy`](proxy.rs) - A webserver that proxies to the hello service above.
 
-* [`send_file`](send_file.rs) - A server that sends back content of files using tokio_fs to read the files asynchronously.
+* [`send_file`](send_file.rs) - A server that sends back content of files using tokio::fs to read the files asynchronously.
 
 * [`single_threaded`](single_threaded.rs) - A server only running on 1 thread, so it can make use of `!Send` app state (like an `Rc` counter).
 

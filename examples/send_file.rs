@@ -1,7 +1,7 @@
 #![deny(warnings)]
 
 use tokio::io::AsyncReadExt;
-use tokio_fs::File;
+use tokio::fs::File;
 
 use hyper::{Body, Method, Result, Request, Response, Server, StatusCode};
 use hyper::service::{make_service_fn, service_fn};
@@ -63,7 +63,7 @@ fn internal_server_error() -> Response<Body> {
 
 async fn simple_file_send(filename: &str) -> Result<Response<Body>> {
     // Serve a file by asynchronously reading it entirely into memory.
-    // Uses tokio_fs to open file asynchronously, then tokio::io::AsyncReadExt
+    // Uses tokio::fs to open file asynchronously, then tokio::io::AsyncReadExt
     // to read into memory asynchronously.
 
     if let Ok(mut file) = File::open(filename).await {

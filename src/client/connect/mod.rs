@@ -372,7 +372,7 @@ where
 pub(super) mod sealed {
     use std::error::Error as StdError;
 
-    use tokio_io::{AsyncRead, AsyncWrite};
+    use tokio::io::{AsyncRead, AsyncWrite};
 
     use crate::common::{Future, Unpin};
     use super::{Connected, Destination};

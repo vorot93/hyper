@@ -12,7 +12,7 @@ use futures::{Async, Poll};
 #[cfg(feature = "runtime")]
 use futures::Future;
 use futures::task::{self, Task};
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 
 #[cfg(feature = "runtime")]
 use crate::client::connect::{Connect, Connected, Destination};

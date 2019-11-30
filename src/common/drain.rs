@@ -1,7 +1,7 @@
 use std::mem;
 
 use futures_util::FutureExt as _;
-use tokio_sync::{mpsc, watch};
+use tokio::sync::{mpsc, watch};
 use pin_project::pin_project;
 
 use super::{Future, Never, Poll, Pin, task};
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn watch() {
-        tokio_test::task::mock(|cx| {
+        tokio::test::task::mock(|cx| {
             let (tx, rx) = channel();
             let fut = TestMe {
                 draining: false,
@@ -198,7 +198,7 @@ mod tests {
 
     #[test]
     fn watch_clones() {
-        tokio_test::task::mock(|cx| {
+        tokio::test::task::mock(|cx| {
             let (tx, rx) = channel();
 
             let fut1 = TestMe {

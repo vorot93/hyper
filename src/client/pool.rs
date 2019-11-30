@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 
 use futures_channel::oneshot;
 #[cfg(feature = "runtime")]
-use tokio_timer::Interval;
+use tokio::timer::Interval;
 
 use crate::common::{Exec, Future, Pin, Poll, Unpin, task};
 use super::Ver;
@@ -916,7 +916,7 @@ mod tests {
     #[test]
     fn test_pool_timer_removes_expired() {
         use std::time::Instant;
-        use tokio_timer::delay;
+        use tokio::timer::delay;
         let mut rt = Runtime::new().unwrap();
         let pool = Pool::new(super::Config {
                 enabled: true,

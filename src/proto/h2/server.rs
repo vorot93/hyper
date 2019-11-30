@@ -4,7 +4,7 @@ use std::marker::Unpin;
 use pin_project::{pin_project, project};
 use h2::Reason;
 use h2::server::{Builder, Connection, Handshake, SendResponse};
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 
 use crate::body::Payload;
 use crate::common::exec::H2Exec;

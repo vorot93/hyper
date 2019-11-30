@@ -3,7 +3,7 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use tokio_executor::{SpawnError, TypedExecutor};
+use tokio::executor::{SpawnError, TypedExecutor};
 
 use crate::body::{Payload, Body};
 use crate::proto::h2::server::H2Stream;
@@ -26,10 +26,10 @@ pub trait SharedExecutor {
 
 impl<E> SharedExecutor for E
 where
-    for<'a> &'a E: tokio_executor::Executor,
+    for<'a> &'a E: tokio::executor::Executor,
 {
     fn shared_spawn(mut self: &Self, future: BoxFuture) -> Result<(), SpawnError> {
-        tokio_executor::Executor::spawn(&mut self, future)
+        tokio::executor::Executor::spawn(&mut self, future)
     }
 }
 
@@ -74,7 +74,7 @@ impl Exec {
                         }
                     }
 
-                    ::tokio_executor::DefaultExecutor::current()
+                    ::tokio::executor::DefaultExecutor::current()
                         .spawn(Box::pin(fut))
                         .map_err(|err| {
                             warn!("executor error: {:?}", err);

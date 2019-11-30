@@ -6,7 +6,7 @@ use std::io;
 
 use bytes::{Buf, BufMut, Bytes, BytesMut};
 use iovec::IoVec;
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 
 use crate::common::{Pin, Poll, Unpin, task};
 use super::{Http1Transaction, ParseContext, ParsedMessage};
@@ -658,7 +658,7 @@ mod tests {
     use super::*;
     use std::time::Duration;
 
-    use tokio_test::io::Builder as Mock;
+    use tokio::test::io::Builder as Mock;
 
     #[cfg(feature = "nightly")]
     use test::Bencher;
@@ -819,7 +819,7 @@ mod tests {
     }
 
     /*
-    TODO: needs tokio_test::io to allow configure write_buf calls
+    TODO: needs tokio::test::io to allow configure write_buf calls
     #[test]
     fn write_buf_queue() {
         let _ = pretty_env_logger::try_init();

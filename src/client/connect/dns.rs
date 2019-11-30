@@ -54,7 +54,7 @@ pub struct GaiAddrs {
 
 /// A future to resolve a name returned by `GaiResolver`.
 pub struct GaiFuture {
-    inner: tokio_executor::blocking::Blocking<Result<IpAddrs, io::Error>>,
+    inner: tokio::executor::blocking::Blocking<Result<IpAddrs, io::Error>>,
 }
 
 impl Name {
@@ -123,7 +123,7 @@ impl Service<Name> for GaiResolver {
     }
 
     fn call(&mut self, name: Name) -> Self::Future {
-        let blocking = tokio_executor::blocking::run(move || {
+        let blocking = tokio::executor::blocking::run(move || {
             debug!("resolving host={:?}", name.host);
             (&*name.host, 0).to_socket_addrs()
                 .map(|i| IpAddrs { iter: i })
@@ -232,7 +232,7 @@ impl Iterator for IpAddrs {
     }
 }
 
-/// A resolver using `getaddrinfo` calls via the `tokio_executor::threadpool::blocking` API.
+/// A resolver using `getaddrinfo` calls via the `tokio::executor::threadpool::blocking` API.
 ///
 /// Unlike the `GaiResolver` this will not spawn dedicated threads, but only works when running on the
 /// multi-threaded Tokio runtime.
@@ -278,10 +278,10 @@ impl Future for TokioThreadpoolGaiFuture {
     type Output = Result<GaiAddrs, io::Error>;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut task::Context<'_>) -> Poll<Self::Output> {
-        match ready!(tokio_executor::threadpool::blocking(|| (self.name.as_str(), 0).to_socket_addrs())) {
+        match ready!(tokio::executor::threadpool::blocking(|| (self.name.as_str(), 0).to_socket_addrs())) {
             Ok(Ok(iter)) => Poll::Ready(Ok(GaiAddrs { inner: IpAddrs { iter } })),
             Ok(Err(e)) => Poll::Ready(Err(e)),
-            // a BlockingError, meaning not on a tokio_executor::threadpool :(
+            // a BlockingError, meaning not on a tokio::executor::threadpool :(
             Err(e) => Poll::Ready(Err(io::Error::new(io::ErrorKind::Other, e))),
         }
     }

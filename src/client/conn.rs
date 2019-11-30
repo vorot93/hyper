@@ -14,7 +14,7 @@ use std::sync::Arc;
 use bytes::Bytes;
 use futures_util::future::{self, Either, FutureExt as _};
 use pin_project::{pin_project, project};
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 use tower_service::Service;
 
 use crate::body::Payload;
@@ -458,7 +458,7 @@ impl Builder {
     /// Provide an executor to execute background HTTP2 tasks.
     pub fn executor<E>(&mut self, exec: E) -> &mut Builder
     where
-        for<'a> &'a E: tokio_executor::Executor,
+        for<'a> &'a E: tokio::executor::Executor,
         E: Send + Sync + 'static,
     {
         self.exec = Exec::Executor(Arc::new(exec));

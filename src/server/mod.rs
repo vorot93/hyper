@@ -59,7 +59,7 @@ use std::fmt;
 
 #[cfg(feature = "tcp")] use std::time::Duration;
 
-use tokio_io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite};
 use pin_project::pin_project;
 
 use crate::body::{Body, Payload};
@@ -128,7 +128,7 @@ impl Server<AddrIncoming, ()> {
 
     /// Create a new instance from a `std::net::TcpListener` instance.
     pub fn from_tcp(listener: StdTcpListener) -> Result<Builder<AddrIncoming>, crate::Error> {
-        let handle = tokio_net::driver::Handle::default();
+        let handle = tokio::net::driver::Handle::default();
         AddrIncoming::from_std(listener, &handle)
             .map(Server::builder)
     }

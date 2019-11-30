@@ -12,8 +12,8 @@ use std::io;
 use std::marker::Unpin;
 
 use bytes::{/*Buf, BufMut, */Bytes};
-use tokio_io::{AsyncRead, AsyncWrite};
-use tokio_sync::oneshot;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::sync::oneshot;
 
 use crate::common::io::Rewind;
 use crate::common::{Future, Pin, Poll, task};
