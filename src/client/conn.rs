@@ -9,7 +9,6 @@
 //! higher-level [Client](super) API.
 use std::fmt;
 use std::mem;
-use std::sync::Arc;
 
 use bytes::Bytes;
 use futures_util::future::{self, Either, FutureExt as _};
@@ -453,16 +452,6 @@ impl Builder {
             http2: false,
             h2_builder,
         }
-    }
-
-    /// Provide an executor to execute background HTTP2 tasks.
-    pub fn executor<E>(&mut self, exec: E) -> &mut Builder
-    where
-        for<'a> &'a E: tokio::executor::Executor,
-        E: Send + Sync + 'static,
-    {
-        self.exec = Exec::Executor(Arc::new(exec));
-        self
     }
 
     pub(super) fn h1_writev(&mut self, enabled: bool) -> &mut Builder {

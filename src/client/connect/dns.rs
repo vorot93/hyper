@@ -30,6 +30,7 @@ use std::net::{
 };
 use std::str::FromStr;
 
+use tokio::task::JoinHandle;
 use tower_service::Service;
 use crate::common::{Future, Pin, Poll, task};
 
@@ -54,7 +55,7 @@ pub struct GaiAddrs {
 
 /// A future to resolve a name returned by `GaiResolver`.
 pub struct GaiFuture {
-    inner: tokio::executor::blocking::Blocking<Result<IpAddrs, io::Error>>,
+    inner: JoinHandle<Result<IpAddrs, io::Error>>,
 }
 
 impl Name {
@@ -123,7 +124,7 @@ impl Service<Name> for GaiResolver {
     }
 
     fn call(&mut self, name: Name) -> Self::Future {
-        let blocking = tokio::executor::blocking::run(move || {
+        let blocking = tokio::task::spawn_blocking(move || {
             debug!("resolving host={:?}", name.host);
             (&*name.host, 0).to_socket_addrs()
                 .map(|i| IpAddrs { iter: i })
@@ -244,7 +245,15 @@ pub struct TokioThreadpoolGaiResolver(());
 #[cfg(feature = "runtime")]
 #[derive(Debug)]
 pub struct TokioThreadpoolGaiFuture {
-    name: Name,
+    inner: JoinHandle<io::Result<vec::IntoIter<SocketAddr>>>,
+}
+
+impl TokioThreadpoolGaiFuture {
+    fn from_name(name: Name) -> Self {
+        Self {
+            inner: tokio::task::spawn_blocking(|| (name.as_str(), 0).to_socket_addrs())
+        }
+    }
 }
 
 #[cfg(feature = "runtime")]
@@ -278,7 +287,7 @@ impl Future for TokioThreadpoolGaiFuture {
     type Output = Result<GaiAddrs, io::Error>;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut task::Context<'_>) -> Poll<Self::Output> {
-        match ready!(tokio::executor::threadpool::blocking(|| (self.name.as_str(), 0).to_socket_addrs())) {
+        match ready!(self.inner) {
             Ok(Ok(iter)) => Poll::Ready(Ok(GaiAddrs { inner: IpAddrs { iter } })),
             Ok(Err(e)) => Poll::Ready(Err(e)),
             // a BlockingError, meaning not on a tokio::executor::threadpool :(

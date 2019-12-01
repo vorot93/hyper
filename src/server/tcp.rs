@@ -4,7 +4,6 @@ use std::net::{SocketAddr, TcpListener as StdTcpListener};
 use std::time::Duration;
 
 use futures_util::FutureExt as _;
-use tokio::net::driver::Handle;
 use tokio::net::TcpListener;
 use tokio::time::Delay;
 
@@ -25,20 +24,15 @@ pub struct AddrIncoming {
 }
 
 impl AddrIncoming {
-    pub(super) fn new(addr: &SocketAddr, handle: Option<&Handle>) -> crate::Result<Self> {
+    pub(super) fn new(addr: &SocketAddr) -> crate::Result<Self> {
         let std_listener = StdTcpListener::bind(addr)
                 .map_err(crate::Error::new_listen)?;
 
-        if let Some(handle) = handle {
-            AddrIncoming::from_std(std_listener, handle)
-        } else {
-            let handle = Handle::default();
-            AddrIncoming::from_std(std_listener, &handle)
-        }
+            AddrIncoming::from_std(std_listener)
     }
 
-    pub(super) fn from_std(std_listener: StdTcpListener, handle: &Handle) -> crate::Result<Self> {
-        let listener = TcpListener::from_std(std_listener, &handle)
+    pub(super) fn from_std(std_listener: StdTcpListener) -> crate::Result<Self> {
+        let listener = TcpListener::from_std(std_listener)
             .map_err(crate::Error::new_listen)?;
         let addr = listener.local_addr().map_err(crate::Error::new_listen)?;
         Ok(AddrIncoming {

@@ -57,8 +57,7 @@ impl Exec {
                         }
                     }
 
-                    ::tokio::executor::DefaultExecutor::current()
-                        .spawn(Box::pin(fut))
+                    ::tokio::spawn(Box::pin(fut))
                         .map_err(|err| {
                             warn!("executor error: {:?}", err);
                             crate::Error::new_execute(TokioSpawnError)
@@ -104,37 +103,5 @@ where
 }
 
 // ==== impl Executor =====
-
-impl<E, F, B> H2Exec<F, B> for E
-where
-    E: TypedExecutor<H2Stream<F, B>> + Clone,
-    H2Stream<F, B>: Future<Output=()>,
-    B: Payload,
-{
-    fn execute_h2stream(&mut self, fut: H2Stream<F, B>) -> crate::Result<()> {
-        self.spawn(fut)
-            .map_err(|err| {
-                warn!("executor error: {:?}", err);
-                crate::Error::new_execute("custom executor failed")
-            })
-    }
-}
-
-impl<I, N, S, E, W> NewSvcExec<I, N, S, E, W> for E
-where
-    E: TypedExecutor<NewSvcTask<I, N, S, E, W>> + Clone,
-    NewSvcTask<I, N, S, E, W>: Future<Output=()>,
-    S: HttpService<Body>,
-    W: Watcher<I, S, E>,
-{
-    fn execute_new_svc(&mut self, fut: NewSvcTask<I, N, S, E, W>) -> crate::Result<()> {
-        self.spawn(fut)
-            .map_err(|err| {
-                warn!("executor error: {:?}", err);
-                crate::Error::new_execute("custom executor failed")
-            })
-    }
-}
-
 // ===== StdError impls =====
 

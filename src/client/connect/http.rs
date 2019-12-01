@@ -10,7 +10,7 @@ use http::uri::{Scheme, Uri};
 use futures_util::{TryFutureExt, FutureExt};
 use pin_project::{pin_project, project};
 use tokio::net::TcpStream;
-use tokio::time::{Delay, Timeout};
+use tokio::time::{Delay};
 
 use crate::common::{Future, Pin, Poll, task};
 use super::{Connected, Destination};
@@ -564,14 +564,14 @@ impl ConnectingTcpRemote {
                         err = Some(e);
                         if let Some(addr) = self.addrs.next() {
                             debug!("connecting to {}", addr);
-                            *current = connect(&addr, local_addr, handle, reuse_address, self.connect_timeout)?;
+                            *current = connect(&addr, local_addr, reuse_address, self.connect_timeout)?;
                             continue;
                         }
                     }
                 }
             } else if let Some(addr) = self.addrs.next() {
                 debug!("connecting to {}", addr);
-                self.current = Some(connect(&addr, local_addr, handle, reuse_address, self.connect_timeout)?);
+                self.current = Some(connect(&addr, local_addr, reuse_address, self.connect_timeout)?);
                 continue;
             }
 
@@ -590,7 +590,7 @@ fn connect(
     Ok(Box::pin(async move {
         let connect = TcpStream::connect(&addr);
         match connect_timeout {
-            Some(timeout) => match Timeout::new(connect, timeout).await {
+            Some(timeout) => match tokio::time::timeout(timeout, connect).await {
                 Ok(Ok(s)) => Ok(s),
                 Ok(Err(e)) => Err(e),
                 Err(e) => Err(io::Error::new(io::ErrorKind::TimedOut, e)),
@@ -636,7 +636,7 @@ impl ConnectingTcp {
                 Poll::Ready(Err(_)) => {
                     // Preferred failed - use fallback as new preferred.
                     self.preferred = fallback.remote;
-                    self.preferred.poll(cx, &self.local_addr, handle, self.reuse_address)
+                    self.preferred.poll(cx, &self.local_addr, self.reuse_address)
                 }
             }
         }
@@ -646,8 +646,6 @@ impl ConnectingTcp {
 #[cfg(test)]
 mod tests {
     use std::io;
-
-    use tokio::net::driver::Handle;
 
     use super::{Connected, Destination, HttpConnector};
     use super::super::sealed::Connect;
@@ -684,15 +682,13 @@ mod tests {
         assert_eq!(&*err.msg, super::INVALID_MISSING_SCHEME);
     }
 
-    #[test]
+    #[tokio::test]
     #[cfg_attr(not(feature = "__internal_happy_eyeballs_tests"), ignore)]
-    fn client_happy_eyeballs() {
+    async fn client_happy_eyeballs() {
         use std::future::Future;
         use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, TcpListener};
         use std::task::Poll;
         use std::time::{Duration, Instant};
-
-        use tokio::runtime::current_thread::Runtime;
 
         use crate::common::{Pin, task};
         use super::dns;
@@ -702,7 +698,6 @@ mod tests {
         let server4 = TcpListener::bind("127.0.0.1:0").unwrap();
         let addr = server4.local_addr().unwrap();
         let _server6 = TcpListener::bind(&format!("[::1]:{}", addr.port())).unwrap();
-        let mut rt = Runtime::new().unwrap();
 
         let local_timeout = Duration::default();
         let unreachable_v4_timeout = measure_connect(unreachable_ipv4_addr()).1;
@@ -762,7 +757,7 @@ mod tests {
             let fut = ConnectingTcpFuture(connecting_tcp);
 
             let start = Instant::now();
-            let res = rt.block_on(fut).unwrap();
+            let res = fut.await;
             let duration = start.elapsed();
 
             // Allow actual duration to be +/- 150ms off.
@@ -784,7 +779,7 @@ mod tests {
             type Output = Result<u8, std::io::Error>;
 
             fn poll(mut self: Pin<&mut Self>, cx: &mut task::Context<'_>) -> Poll<Self::Output> {
-                match self.0.poll(cx,&Some(Handle::default())) {
+                match self.0.poll(cx) {
                     Poll::Ready(Ok(stream)) => Poll::Ready(Ok(
                         if stream.peer_addr().unwrap().is_ipv4() { 4 } else { 6 }
                     )),

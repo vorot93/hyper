@@ -1,7 +1,7 @@
 use std::io::{self, Read};
 use std::marker::Unpin;
 
-use bytes::{Buf, Bytes, IntoBuf};
+use bytes::{Buf, Bytes};
 use tokio::io::{AsyncRead, AsyncWrite};
 
 use crate::common::{Pin, Poll, task};

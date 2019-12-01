@@ -253,8 +253,6 @@ mod tests {
     use std::pin::Pin;
     use std::task::{Context, Poll};
 
-    use tokio::runtime::current_thread::Runtime;
-
     use super::{Callback, channel, Receiver};
 
     #[derive(Debug)]
@@ -285,23 +283,22 @@ mod tests {
         }
     }
 
-    #[test]
-    fn drop_receiver_sends_cancel_errors() {
+    #[tokio::test]
+    async fn drop_receiver_sends_cancel_errors() {
         let _ = pretty_env_logger::try_init();
-        let mut rt = Runtime::new().unwrap();
 
         let (mut tx, mut rx) = channel::<Custom, ()>();
 
         // must poll once for try_send to succeed
-        rt.block_on(async {
+        async {
             let poll_once = PollOnce(&mut rx);
             assert!(poll_once.await.is_none(), "rx empty");
-        });
+        }.await;
 
         let promise = tx.try_send(Custom(43)).unwrap();
         drop(rx);
 
-        rt.block_on(async {
+        async {
             let fulfilled = promise.await;
             let err = fulfilled
                 .expect("fulfilled")
@@ -310,31 +307,30 @@ mod tests {
                 (&crate::error::Kind::Canceled, Some(_)) => (),
                 e => panic!("expected Error::Cancel(_), found {:?}", e),
             }
-        });
+        }.await;
     }
 
-    #[test]
-    fn sender_checks_for_want_on_send() {
-        let mut rt = Runtime::new().unwrap();
+    #[tokio::test]
+    async fn sender_checks_for_want_on_send() {
         let (mut tx, mut rx) = channel::<Custom, ()>();
 
         // one is allowed to buffer, second is rejected
         let _ = tx.try_send(Custom(1)).expect("1 buffered");
         tx.try_send(Custom(2)).expect_err("2 not ready");
 
-        rt.block_on(async {
+        async {
             let poll_once = PollOnce(&mut rx);
             assert!(poll_once.await.is_some(), "rx empty");
-        });
+        }.await;
 
         // Even though 1 has been popped, only 1 could be buffered for the
         // lifetime of the channel.
         tx.try_send(Custom(2)).expect_err("2 still not ready");
 
-        rt.block_on(async {
+        async {
             let poll_once = PollOnce(&mut rx);
             assert!(poll_once.await.is_none(), "rx empty");
-        });
+        }.await;
 
         let _ = tx.try_send(Custom(2)).expect("2 ready");
     }
@@ -358,7 +354,7 @@ mod tests {
     fn giver_queue_throughput(b: &mut test::Bencher) {
         use crate::{Body, Request, Response};
 
-        let mut rt = Runtime::new().unwrap();
+        let mut rt = tokio::runtime::Runtime::new().unwrap();
         let (mut tx, mut rx) = channel::<Request<Body>, Response<Body>>();
 
         b.iter(move || {
@@ -378,7 +374,7 @@ mod tests {
     #[cfg(feature = "nightly")]
     #[bench]
     fn giver_queue_not_ready(b: &mut test::Bencher) {
-        let mut rt = Runtime::new().unwrap();
+        let mut rt = tokio::runtime::Builder::new().basic_scheduler().enable_all().build().unwrap();
         let (_tx, mut rx) = channel::<i32, ()>();
         b.iter(move || {
             rt.block_on(async {

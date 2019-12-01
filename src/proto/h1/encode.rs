@@ -1,6 +1,6 @@
 use std::fmt;
 
-use bytes::{Buf, IntoBuf};
+use bytes::{Buf};
 use bytes::buf::{Chain, Take};
 use iovec::IoVec;
 
