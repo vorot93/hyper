@@ -757,7 +757,7 @@ mod tests {
             let fut = ConnectingTcpFuture(connecting_tcp);
 
             let start = Instant::now();
-            let res = fut.await;
+            let res = fut.await.unwrap();
             let duration = start.elapsed();
 
             // Allow actual duration to be +/- 150ms off.

@@ -2,7 +2,7 @@ use std::cell::Cell;
 use std::cmp;
 use std::collections::VecDeque;
 use std::fmt;
-use std::io;
+use std::io::{self, IoSlice};
 
 use bytes::{Buf, BufMut, Bytes, BytesMut};
 use iovec::IoVec;
@@ -520,7 +520,7 @@ impl<B: Buf> Buf for WriteBuf<B> {
     }
 
     #[inline]
-    fn bytes_vec<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
+    fn bytes_vectored<'t>(&'t self, dst: &mut [IoSlice<'t>]) -> usize {
         let n = self.headers.bytes_vec(dst);
         self.queue.bytes_vec(&mut dst[n..]) + n
     }
@@ -562,7 +562,7 @@ impl<'a, B: Buf> Buf for WriteBufAuto<'a, B> {
     }
 
     #[inline]
-    fn bytes_vec<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
+    fn bytes_vectored<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
         self.bytes_vec_called.set(true);
         self.inner.bytes_vec(dst)
     }
@@ -638,7 +638,7 @@ impl<T: Buf> Buf for BufDeque<T> {
     }
 
     #[inline]
-    fn bytes_vec<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
+    fn bytes_vectored<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
         if dst.is_empty() {
             return 0;
         }

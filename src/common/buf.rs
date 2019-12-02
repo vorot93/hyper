@@ -1,5 +1,5 @@
 use bytes::Buf;
-use iovec::IoVec;
+use std::io::IoSlice;
 
 /// A `Buf` wrapping a static byte slice.
 #[derive(Debug)]
@@ -22,7 +22,7 @@ impl Buf for StaticBuf {
     }
 
     #[inline]
-    fn bytes_vec<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
+    fn bytes_vectored<'t>(&'t self, dst: &mut [IoSlice<'t>]) -> usize {
         if dst.is_empty() || self.0.is_empty() {
             0
         } else {

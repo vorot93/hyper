@@ -1,8 +1,8 @@
 use std::fmt;
+use std::io::IoSlice;
 
 use bytes::{Buf};
-use bytes::buf::{Chain, Take};
-use iovec::IoVec;
+use bytes::buf::ext::{Chain, Take};
 
 use crate::common::StaticBuf;
 use super::io::WriteBuf;
@@ -90,9 +90,9 @@ impl Encoder {
         }
     }
 
-    pub fn encode<B>(&mut self, msg: B) -> EncodedBuf<B::Buf>
+    pub fn encode<B>(&mut self, msg: B) -> EncodedBuf<B>
     where
-        B: IntoBuf,
+        B: Buf,
     {
         let msg = msg.into_buf();
         let len = msg.remaining();
@@ -127,9 +127,9 @@ impl Encoder {
         }
     }
 
-    pub(super) fn encode_and_end<B>(&self, msg: B, dst: &mut WriteBuf<EncodedBuf<B::Buf>>) -> bool
+    pub(super) fn encode_and_end<B>(&self, msg: B, dst: &mut WriteBuf<EncodedBuf<B>>) -> bool
     where
-        B: IntoBuf,
+        B: Buf,
     {
         let msg = msg.into_buf();
         let len = msg.remaining();
@@ -176,9 +176,9 @@ impl Encoder {
     /// This is used in conjunction with Payload::__hyper_full_data(), which
     /// means we can trust that the buf has the correct size (the buf itself
     /// was checked to make the headers).
-    pub(super) fn danger_full_buf<B>(self, msg: B, dst: &mut WriteBuf<EncodedBuf<B::Buf>>)
+    pub(super) fn danger_full_buf<B>(self, msg: B, dst: &mut WriteBuf<EncodedBuf<B>>)
     where
-        B: IntoBuf,
+        B: Buf,
     {
         let msg = msg.into_buf();
         debug_assert!(msg.remaining() > 0, "encode() called with empty buf");
@@ -238,7 +238,7 @@ where
     }
 
     #[inline]
-    fn bytes_vec<'t>(&'t self, dst: &mut [&'t IoVec]) -> usize {
+    fn bytes_vectored<'t>(&'t self, dst: &mut [IoSlice<'t>]) -> usize {
         match self.kind {
             BufKind::Exact(ref b) => b.bytes_vec(dst),
             BufKind::Limited(ref b) => b.bytes_vec(dst),

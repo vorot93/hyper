@@ -1,5 +1,6 @@
 use std::io::{self, Read};
 use std::marker::Unpin;
+use std::mem::MaybeUninit;
 
 use bytes::{Buf, Bytes};
 use tokio::io::{AsyncRead, AsyncWrite};
@@ -43,7 +44,7 @@ where
     T: AsyncRead + Unpin,
 {
     #[inline]
-    unsafe fn prepare_uninitialized_buffer(&self, buf: &mut [u8]) -> bool {
+    unsafe fn prepare_uninitialized_buffer(&self, buf: &mut [MaybeUninit<u8>]) -> bool {
         self.inner.prepare_uninitialized_buffer(buf)
     }
 
