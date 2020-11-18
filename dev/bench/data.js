@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1605654049735,
+  "lastUpdate": 1605682676206,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -59,6 +59,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 65053,
             "range": "± 8020",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4e55583d30a597884883f1a51b678f5c57c76765",
+          "message": "feat(client): Make `client` an optional feature\n\ncc #2223\r\n\r\nBREAKING CHANGE: The HTTP client of hyper is now an optional feature. To\r\n  enable the client, add `features = [\"client\"]` to the dependency in\r\n  your `Cargo.toml`.",
+          "timestamp": "2020-11-17T17:06:25-08:00",
+          "tree_id": "a96d23e59a63b4783772da0aa92b70f346ba446c",
+          "url": "https://github.com/vorot93/hyper/commit/4e55583d30a597884883f1a51b678f5c57c76765"
+        },
+        "date": 1605682668628,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 53893,
+            "range": "± 2379",
             "unit": "ns/iter"
           }
         ]
