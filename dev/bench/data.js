@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1605682835931,
+  "lastUpdate": 1605754675209,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -89,6 +89,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 53893,
             "range": "± 2379",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eliza@buoyant.io",
+            "name": "Eliza Weisman",
+            "username": "hawkw"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "abb6471690f796e1b96bb2d7b1042f424d69f169",
+          "message": "refactor(client): use tokio's TcpSocket for more sockopts (#2335)\n\nSigned-off-by: Eliza Weisman <eliza@buoyant.io>",
+          "timestamp": "2020-11-18T14:45:45-08:00",
+          "tree_id": "c8d1bedaa9af64428ba5cdc93170b1c62cc3564e",
+          "url": "https://github.com/vorot93/hyper/commit/abb6471690f796e1b96bb2d7b1042f424d69f169"
+        },
+        "date": 1605754667687,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 66096,
+            "range": "± 6364",
             "unit": "ns/iter"
           }
         ]
