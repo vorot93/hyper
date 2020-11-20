@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1605754836372,
+  "lastUpdate": 1605841040885,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -119,6 +119,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 66096,
             "range": "± 6364",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "121c33132c0950aaa422848cdc43f6691ddf5785",
+          "message": "feat(upgrade): Moved HTTP upgrades off `Body` to a new API (#2337)\n\nCloses #2086\r\n\r\nBREAKING CHANGE: The method `Body::on_upgrade()` is gone. It is\r\n  essentially replaced with `hyper::upgrade::on(msg)`.",
+          "timestamp": "2020-11-19T16:36:12-08:00",
+          "tree_id": "33e278842408a37663173a39ba973df4e6786bdc",
+          "url": "https://github.com/vorot93/hyper/commit/121c33132c0950aaa422848cdc43f6691ddf5785"
+        },
+        "date": 1605841034302,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 49196,
+            "range": "± 1693",
             "unit": "ns/iter"
           }
         ]
