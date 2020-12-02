@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1606874809372,
+  "lastUpdate": 1606874840797,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -571,6 +571,36 @@ window.BENCHMARK_DATA = {
             "name": "hello_world_16",
             "value": 57089,
             "range": "± 15100",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "campbellC@users.noreply.github.com",
+            "name": "Chris Campbell",
+            "username": "campbellC"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f8641733be3c732acd6c94ec9ad161b88a4d467d",
+          "message": "docs(client): add example of client conn usage (#2350)\n\nAdd basic, module level example for the Builder performing a handshake,\r\nspawning a task to run the Connection and sending a single request and\r\nreceiving the response.\r\n\r\nCloses #2272",
+          "timestamp": "2020-12-01T15:58:28-08:00",
+          "tree_id": "e2f028a020be1b9371e71c37d2c8a1ede13cd4fe",
+          "url": "https://github.com/vorot93/hyper/commit/f8641733be3c732acd6c94ec9ad161b88a4d467d"
+        },
+        "date": 1606874833255,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "hello_world_16",
+            "value": 63889,
+            "range": "± 29971",
             "unit": "ns/iter"
           }
         ]
