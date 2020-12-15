@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1607994276093,
+  "lastUpdate": 1608068027748,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -781,6 +781,36 @@ window.BENCHMARK_DATA = {
             "name": "hello_world_16",
             "value": 48011,
             "range": "± 2706",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arve.knudsen@gmail.com",
+            "name": "Arve Knudsen",
+            "username": "aknuds1"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ede3a6bd9dfd8f33d6c0a4efd94f5bdafe383ebd",
+          "message": "refactor(http1): move upgrade state from body to head (#2353)\n\nMove state required for protocol upgrades to head\r\nrepresentations, instead of associating it with the body.\r\n\r\nCloses #2340.\r\n\r\nSigned-off-by: Arve Knudsen <arve.knudsen@gmail.com>",
+          "timestamp": "2020-12-15T07:31:48-08:00",
+          "tree_id": "ce286b8ff248e5bf4aa6e6f01981ed49c84d72b1",
+          "url": "https://github.com/vorot93/hyper/commit/ede3a6bd9dfd8f33d6c0a4efd94f5bdafe383ebd"
+        },
+        "date": 1608068021015,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "hello_world_16",
+            "value": 47136,
+            "range": "± 2491",
             "unit": "ns/iter"
           }
         ]
