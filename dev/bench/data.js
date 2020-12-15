@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1607994130229,
+  "lastUpdate": 1607994276093,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -2439,6 +2439,144 @@ window.BENCHMARK_DATA = {
             "name": "http2_req_100kb",
             "value": 106902,
             "range": "± 17180",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "info@bnoordhuis.nl",
+            "name": "Ben Noordhuis",
+            "username": "bnoordhuis"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7d9a5806e146798d0cbe67672bbe3ad5ae680393",
+          "message": "refactor(http1): change HTTP2->1.1 warning to debug (#2354)\n\nWe use hyper in a proxy-like way where an incoming HTTP/2 request is\r\nproxied to a HTTP/1 backend and it was reported that the protocol\r\ncoercion warnings were a limiting factor in the total throughput\r\nof the system.\r\n\r\nWhile it can be worked around by explicitly setting the request version\r\nto HTTP_11, it seems likely other people also hit this performance snag.\r\nThat's why this commit changes them from warnings to debug messages.",
+          "timestamp": "2020-12-14T13:57:32-08:00",
+          "tree_id": "9e3c4f830981935a989cd5e49ed4969a219ee850",
+          "url": "https://github.com/vorot93/hyper/commit/7d9a5806e146798d0cbe67672bbe3ad5ae680393"
+        },
+        "date": 1607994268462,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http1_body_both_100kb",
+            "value": 76285,
+            "range": "± 1853",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_body_both_10mb",
+            "value": 7245216,
+            "range": "± 421595",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_get",
+            "value": 31960,
+            "range": "± 662",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_empty",
+            "value": 223224,
+            "range": "± 4291",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10kb_100_chunks",
+            "value": 52780532,
+            "range": "± 1731947",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10mb",
+            "value": 50928687,
+            "range": "± 1702514",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_10mb",
+            "value": 53942482,
+            "range": "± 1289667",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_1mb",
+            "value": 3992966,
+            "range": "± 389144",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_post",
+            "value": 35941,
+            "range": "± 1280",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_get",
+            "value": 53207,
+            "range": "± 2544",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_empty",
+            "value": 174307,
+            "range": "± 4579",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks",
+            "value": 8600935,
+            "range": "± 9263818",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_adaptive_window",
+            "value": 9179842,
+            "range": "± 9617433",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_max_window",
+            "value": 8795833,
+            "range": "± 9733978",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10mb",
+            "value": 58357049,
+            "range": "± 4668620",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_10mb",
+            "value": 72922649,
+            "range": "± 14445942",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_1mb",
+            "value": 6156896,
+            "range": "± 594228",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_post",
+            "value": 60306,
+            "range": "± 12376",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_req_100kb",
+            "value": 117652,
+            "range": "± 3104",
             "unit": "ns/iter"
           }
         ]
