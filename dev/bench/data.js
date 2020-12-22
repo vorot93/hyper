@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1608623503057,
+  "lastUpdate": 1608675829994,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -479,6 +479,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 49579,
             "range": "± 8226",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pankajchaudhary172@gmail.com",
+            "name": "Pankaj Chaudhary",
+            "username": "PankajChaudhary5"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3b3077da1f891b09de18320d9f6ccf94f136943d",
+          "message": "refactor(http1): updated Encoder/Decoder match with the matches macro (#2368)",
+          "timestamp": "2020-12-22T10:50:57-08:00",
+          "tree_id": "954af38876df04f6db5c6ee06c14b56137895d6c",
+          "url": "https://github.com/vorot93/hyper/commit/3b3077da1f891b09de18320d9f6ccf94f136943d"
+        },
+        "date": 1608675823527,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 45573,
+            "range": "± 1169",
             "unit": "ns/iter"
           }
         ]
