@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1608755756925,
+  "lastUpdate": 1608755761918,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -1051,6 +1051,36 @@ window.BENCHMARK_DATA = {
             "name": "hello_world_16",
             "value": 48901,
             "range": "± 2166",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "distinct": true,
+          "id": "c784a10174deb461b2eaa59ed9fabae5c315eb68",
+          "message": "v0.14.0",
+          "timestamp": "2020-12-23T10:58:04-08:00",
+          "tree_id": "d2d618457fe2744c73a88c191d7ac276e12343ba",
+          "url": "https://github.com/vorot93/hyper/commit/c784a10174deb461b2eaa59ed9fabae5c315eb68"
+        },
+        "date": 1608755753807,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "hello_world_16",
+            "value": 55456,
+            "range": "± 6727",
             "unit": "ns/iter"
           }
         ]
