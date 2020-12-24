@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1608776557708,
+  "lastUpdate": 1608776677099,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -3627,6 +3627,144 @@ window.BENCHMARK_DATA = {
             "name": "http2_req_100kb",
             "value": 101150,
             "range": "± 2072",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "distinct": true,
+          "id": "3d6bdbe85006e623eae83d7c3ce9a45680d6c2c8",
+          "message": "v0.14.1",
+          "timestamp": "2020-12-23T13:01:14-08:00",
+          "tree_id": "75ef9cf142d8a168ed3445192349cd6e581a8501",
+          "url": "https://github.com/vorot93/hyper/commit/3d6bdbe85006e623eae83d7c3ce9a45680d6c2c8"
+        },
+        "date": 1608776670472,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http1_body_both_100kb",
+            "value": 68347,
+            "range": "± 911",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_body_both_10mb",
+            "value": 8024781,
+            "range": "± 329380",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_get",
+            "value": 28648,
+            "range": "± 521",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_empty",
+            "value": 207700,
+            "range": "± 5492",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10kb_100_chunks",
+            "value": 52005016,
+            "range": "± 509964",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10mb",
+            "value": 53293540,
+            "range": "± 1337228",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_10mb",
+            "value": 55016242,
+            "range": "± 1307305",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_1mb",
+            "value": 4298482,
+            "range": "± 580863",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_post",
+            "value": 32623,
+            "range": "± 934",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_get",
+            "value": 45968,
+            "range": "± 969",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_empty",
+            "value": 147528,
+            "range": "± 1770",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks",
+            "value": 7684989,
+            "range": "± 8873111",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_adaptive_window",
+            "value": 7731256,
+            "range": "± 8899018",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_max_window",
+            "value": 7425719,
+            "range": "± 8661457",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10mb",
+            "value": 54475583,
+            "range": "± 3382351",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_10mb",
+            "value": 71440241,
+            "range": "± 15184560",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_1mb",
+            "value": 6203936,
+            "range": "± 866697",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_post",
+            "value": 51827,
+            "range": "± 855",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_req_100kb",
+            "value": 101550,
+            "range": "± 2358",
             "unit": "ns/iter"
           }
         ]
