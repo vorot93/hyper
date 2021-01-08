@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1610147895070,
+  "lastUpdate": 1610148015167,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -4221,6 +4221,144 @@ window.BENCHMARK_DATA = {
             "name": "http2_req_100kb",
             "value": 115895,
             "range": "± 8580",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "distinct": true,
+          "id": "c9c46ed60bd43484d67a98a63496ad0277c791a2",
+          "message": "refactor(ffi): Add Reason-Phrase API\n\nThis adds an internal ability to copy the HTTP/1 reason-phrase and place\nit in the `http::Extensions` of a response, if it doesn't match the\ncanonical reason. This could be exposed in the Rust API later, but for\nnow it is only used by the C API.",
+          "timestamp": "2021-01-08T10:25:53-08:00",
+          "tree_id": "08e88a2638eb39443de49d5c60610b9f5c4315da",
+          "url": "https://github.com/vorot93/hyper/commit/c9c46ed60bd43484d67a98a63496ad0277c791a2"
+        },
+        "date": 1610148009268,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http1_body_both_100kb",
+            "value": 68710,
+            "range": "± 727",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_body_both_10mb",
+            "value": 7543354,
+            "range": "± 975172",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_get",
+            "value": 29495,
+            "range": "± 634",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_empty",
+            "value": 213525,
+            "range": "± 6162",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10kb_100_chunks",
+            "value": 51606365,
+            "range": "± 1633058",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10mb",
+            "value": 52656683,
+            "range": "± 1815687",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_10mb",
+            "value": 56740064,
+            "range": "± 1860578",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_1mb",
+            "value": 3954290,
+            "range": "± 558808",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_post",
+            "value": 28485,
+            "range": "± 784",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_get",
+            "value": 41539,
+            "range": "± 640",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_empty",
+            "value": 132708,
+            "range": "± 1493",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks",
+            "value": 6846733,
+            "range": "± 8940240",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_adaptive_window",
+            "value": 6893043,
+            "range": "± 42513",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_max_window",
+            "value": 6652602,
+            "range": "± 9172509",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10mb",
+            "value": 48804507,
+            "range": "± 3836983",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_10mb",
+            "value": 66012671,
+            "range": "± 13425735",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_1mb",
+            "value": 5409022,
+            "range": "± 903737",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_post",
+            "value": 47690,
+            "range": "± 3920",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_req_100kb",
+            "value": 90912,
+            "range": "± 1716",
             "unit": "ns/iter"
           }
         ]
