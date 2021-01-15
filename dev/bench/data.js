@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1610668870090,
+  "lastUpdate": 1610745384989,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -749,6 +749,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 56826,
             "range": "± 8404",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "24809834+aeryz@users.noreply.github.com",
+            "name": "Abdullah Eryuzlu",
+            "username": "aeryz"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bf8d74ad1cf7d0b33b470b1e61625ebac56f9c4c",
+          "message": "feat(body): add `send_trailers` to Body channel's `Sender` (#2387)\n\nCloses #2260",
+          "timestamp": "2021-01-15T10:14:21-08:00",
+          "tree_id": "98ca623fc9171719aabfeac75bad0285557a25fb",
+          "url": "https://github.com/vorot93/hyper/commit/bf8d74ad1cf7d0b33b470b1e61625ebac56f9c4c"
+        },
+        "date": 1610745378265,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 44700,
+            "range": "± 3988",
             "unit": "ns/iter"
           }
         ]
