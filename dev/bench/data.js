@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1611109434515,
+  "lastUpdate": 1611109452403,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -839,6 +839,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 72859,
             "range": "± 11483",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "paolo@paolo565.org",
+            "name": "Paolo Barbolini",
+            "username": "paolobarbolini"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "237b2ce08341266b62a8d1cfa974779c511a0710",
+          "message": "refactor(lib): Remove useless uses of Pin (#2405)",
+          "timestamp": "2021-01-19T14:51:34-08:00",
+          "tree_id": "850a7bc3c25f7d4f85ccb325ecd0e717537eedf0",
+          "url": "https://github.com/vorot93/hyper/commit/237b2ce08341266b62a8d1cfa974779c511a0710"
+        },
+        "date": 1611109444575,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 50718,
+            "range": "± 3642",
             "unit": "ns/iter"
           }
         ]
