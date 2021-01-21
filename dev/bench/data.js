@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1611198170977,
+  "lastUpdate": 1611198180872,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -1771,6 +1771,36 @@ window.BENCHMARK_DATA = {
             "name": "hello_world_16",
             "value": 46364,
             "range": "± 2620",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "distinct": true,
+          "id": "1928682b33f98244435ba6d574677546205a15ec",
+          "message": "feat(ffi): add HYPERE_INVALID_PEER_MESSAGE error code for parse errors",
+          "timestamp": "2021-01-20T15:10:19-08:00",
+          "tree_id": "e87d140b4320ce0f482aa7ee06ddeb97a4822f19",
+          "url": "https://github.com/vorot93/hyper/commit/1928682b33f98244435ba6d574677546205a15ec"
+        },
+        "date": 1611198172591,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "hello_world_16",
+            "value": 55362,
+            "range": "± 5106",
             "unit": "ns/iter"
           }
         ]
