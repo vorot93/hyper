@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1612303527557,
+  "lastUpdate": 1612320163152,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -989,6 +989,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 68022,
             "range": "± 7175",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "vorner@vorner.cz",
+            "name": "Michal 'vorner' Vaner",
+            "username": "vorner"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4d2125c67c8087de863f74278a017c4caf37e6a9",
+          "message": "perf(body): specialize BufList::copy_to_bytes (#2413)\n\nSome implementations of the Buf trait have an optimized version (for\r\nexample Bytes) of copy_to_bytes, opportunistically use that one.",
+          "timestamp": "2021-02-02T17:09:06-08:00",
+          "tree_id": "f97fa886587f34e8aa412ff28bb5d237ae850a3f",
+          "url": "https://github.com/vorot93/hyper/commit/4d2125c67c8087de863f74278a017c4caf37e6a9"
+        },
+        "date": 1612320155915,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 69902,
+            "range": "± 5681",
             "unit": "ns/iter"
           }
         ]
