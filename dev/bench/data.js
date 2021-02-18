@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1613685204743,
+  "lastUpdate": 1613685352784,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -7191,6 +7191,144 @@ window.BENCHMARK_DATA = {
             "name": "http2_req_100kb",
             "value": 116032,
             "range": "± 10122",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "markus.westerlind@distilnetworks.com",
+            "name": "Markus Westerlind",
+            "username": "Marwes"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f01de8e503c649034a53a8fdf3ad2e107ad9ad2d",
+          "message": "refactor(client): Use async/await more (#2437)\n\n* refactor: Use async/await in client.rs\r\n\r\n* refactor: Simplify client.rs a bit more\r\n\r\n* refactor: Allow !Unpin in Lazy\r\n\r\n* Remove some impl Future\r\n\r\n* Remove some combinator use",
+          "timestamp": "2021-02-18T10:35:43-08:00",
+          "tree_id": "ecce068928942422a611eea6f2e2c7533022f73d",
+          "url": "https://github.com/vorot93/hyper/commit/f01de8e503c649034a53a8fdf3ad2e107ad9ad2d"
+        },
+        "date": 1613685345312,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http1_body_both_100kb",
+            "value": 120779,
+            "range": "± 10439",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_body_both_10mb",
+            "value": 8214849,
+            "range": "± 2127950",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_get",
+            "value": 44222,
+            "range": "± 4444",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_empty",
+            "value": 276899,
+            "range": "± 31796",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10kb_100_chunks",
+            "value": 52005704,
+            "range": "± 872451",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_req_10mb",
+            "value": 50699889,
+            "range": "± 4931479",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_10mb",
+            "value": 52918918,
+            "range": "± 7180793",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_parallel_x10_res_1mb",
+            "value": 3716071,
+            "range": "± 963688",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http1_post",
+            "value": 51251,
+            "range": "± 6565",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_get",
+            "value": 78726,
+            "range": "± 5554",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_empty",
+            "value": 203064,
+            "range": "± 18998",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks",
+            "value": 10814099,
+            "range": "± 8947063",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_adaptive_window",
+            "value": 10852007,
+            "range": "± 9317381",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10kb_100_chunks_max_window",
+            "value": 10708800,
+            "range": "± 9130964",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_req_10mb",
+            "value": 60054072,
+            "range": "± 6565634",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_10mb",
+            "value": 74446130,
+            "range": "± 16775791",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_parallel_x10_res_1mb",
+            "value": 6548328,
+            "range": "± 1578616",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_post",
+            "value": 87859,
+            "range": "± 5477",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "http2_req_100kb",
+            "value": 156820,
+            "range": "± 9387",
             "unit": "ns/iter"
           }
         ]
