@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1614030016134,
+  "lastUpdate": 1614030033390,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -2311,6 +2311,36 @@ window.BENCHMARK_DATA = {
             "name": "hello_world_16",
             "value": 69524,
             "range": "± 25145",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cfir16@gmail.com",
+            "name": "CfirTsabari",
+            "username": "CfirTsabari"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0b11eee9bde421cdc1680cadabfd38c5aff8e62f",
+          "message": "fix(client): omit default port from automatic Host headers (#2441)\n\nFixes hyperium/hyper#2407",
+          "timestamp": "2021-02-22T11:33:28-08:00",
+          "tree_id": "5623a60dd93bcebc066f49c52f6b97ab29c074b1",
+          "url": "https://github.com/vorot93/hyper/commit/0b11eee9bde421cdc1680cadabfd38c5aff8e62f"
+        },
+        "date": 1614030026021,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "hello_world_16",
+            "value": 65444,
+            "range": "± 9093",
             "unit": "ns/iter"
           }
         ]
