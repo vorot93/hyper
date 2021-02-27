@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1614405506021,
+  "lastUpdate": 1614405509866,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -2431,6 +2431,36 @@ window.BENCHMARK_DATA = {
             "name": "hello_world_16",
             "value": 64937,
             "range": "± 12666",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sean@seanmonstar.com",
+            "name": "Sean McArthur",
+            "username": "seanmonstar"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f162ca2f2fd14681e11dd8b9ba8d1469b2b9271b",
+          "message": "docs(ffi): generate FFI documentation (#2447)",
+          "timestamp": "2021-02-26T19:00:37-08:00",
+          "tree_id": "6fb822dc3e7c899c8cfbd23348c87583879f465a",
+          "url": "https://github.com/vorot93/hyper/commit/f162ca2f2fd14681e11dd8b9ba8d1469b2b9271b"
+        },
+        "date": 1614405501719,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "hello_world_16",
+            "value": 65924,
+            "range": "± 14020",
             "unit": "ns/iter"
           }
         ]
