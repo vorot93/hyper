@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1614405692056,
+  "lastUpdate": 1614945249566,
   "repoUrl": "https://github.com/vorot93/hyper",
   "entries": {
     "connect": [
@@ -1229,6 +1229,36 @@ window.BENCHMARK_DATA = {
             "name": "http_connector",
             "value": 69195,
             "range": "± 4411",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "peter@smitmail.eu",
+            "name": "Peter Smit",
+            "username": "psmit"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8cbf9527dfb313b3f84fcd83260c5c72ce4a1beb",
+          "message": "fix(server): skip automatic Content-Length headers when not allowed (#2216)\n\nCloses #2215",
+          "timestamp": "2021-03-04T17:03:33-08:00",
+          "tree_id": "8c8f7d8ab9d86213ee1f48be464f206ede927d71",
+          "url": "https://github.com/vorot93/hyper/commit/8cbf9527dfb313b3f84fcd83260c5c72ce4a1beb"
+        },
+        "date": 1614945242135,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "http_connector",
+            "value": 70804,
+            "range": "± 6561",
             "unit": "ns/iter"
           }
         ]
